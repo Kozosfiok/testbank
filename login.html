@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Of MAMA Bejelentkezés</title>
+  <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #7097E6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      position: relative;
+    }
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 300px;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+    }
+
+    .login-box input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .login-box button {
+      padding: 10px 20px;
+      background-color: #7097E6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-box button:hover {
+      background-color: #357ae8;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Logo Styling */
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 150px; /* Increased size */
+      height: 150px; /* Increased size */
+    }
+	 .fade-out {
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  body.fade-bg {
+    background-color: #7097E6 !important;
+    transition: background-color 1s ease;
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Logo at the top-right corner -->
+  <img src="logo.png" alt="Logo" class="logo">
+
+  <div class="login-box">
+    <h2>Bejelentkezés a Bank Of MAMA fiókba</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Felhasználónév" required><br>
+      <input type="password" id="password" placeholder="Jelszó" required><br>
+      <button type="submit">Bejelentkezés</button>
+      <div class="error" id="error-msg"></div>
+    </form>
+  </div>
+
+  <script>
+  const accounts = [
+    { username: 'Máté', password: '12345678', page: 'mate.html' },
+    { username: 'Dani', password: '00000000', page: 'dani.html' },
+    { username: 'Barni', password: '1234', page: 'barni.html' },
+    { username: 'Ádám', password: 'password4', page: 'adam.html' },
+    { username: 'Kamilla', password: '0513', page: 'kamilla.html' },
+    { username: 'Mama', password: '0114', page: 'mama.html' }
+  ];
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const inputUser = document.getElementById('username').value.trim();
+    const inputPass = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('error-msg');
+    const loginBox = document.querySelector('.login-box');
+
+    errorMsg.textContent = '';
+
+    const match = accounts.find(acc => acc.username === inputUser && acc.password === inputPass);
+
+    if (match) {
+      // Indítsuk az animációt
+      loginBox.classList.add('fade-out');
+      document.body.classList.add('fade-bg');
+
+      // Várjunk az animáció végéig (1s), majd irányítsunk át
+      setTimeout(() => {
+        window.location.href = match.page;
+      }, 1000);
+    } else {
+      errorMsg.textContent = 'Hibás felhasználónév vagy jelszó.';
+    }
+  });
+</script>
+
+</body>
+</html>

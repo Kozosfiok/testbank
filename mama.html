@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mama bankja</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #7097E6;
+      text-align: center;
+      padding: 40px;
+    }
+    .card {
+      background: white;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-width: 400px;
+    }
+    input, select {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+    }
+    .button {
+      padding: 10px 20px;
+      background-color: #7097E6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #357ae8;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    /* Logo Styling */
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 150px; /* Increased size */
+      height: 150px; /* Increased size */
+    }
+    /* Kupon lista gomb */
+    .coupon-btn {
+      margin-left: 10px;
+      background-color: #4CAF50;
+      padding: 5px 10px;
+      font-size: 0.9em;
+    }
+    .coupon-btn:hover {
+      background-color: #388E3C;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="Logo" class="logo">
+  <div class="card">
+    <h1>Üdvözlünk, Mama!</h1>
+    <p>Egyenleged: <strong id="balance">0 Ft</strong></p>
+
+    <h3>Utalás</h3>
+    <select id="receiver">
+      <option value="" disabled selected>Válassz címzettet</option>
+      <option value="Dani">Dani</option>
+      <option value="Barni">Barni</option>
+      <option value="Ádám">Ádám</option>
+      <option value="Kamilla">Kamilla</option>
+      <option value="Máté">Máté</option>
+    </select><br />
+    <input type="number" id="amount" placeholder="Összeg Ft-ban" /><br />
+    <button class="button" onclick="transfer()">Utalás</button>
+
+    <p id="message"></p>
+
+    <hr />
+
+    <!-- Kupon rész -->
+    <h3>Kupon beváltása</h3>
+    <input type="text" id="couponCode" placeholder="Írd be a kuponkódot" />
+    <button class="button" onclick="activateCoupon()">Beváltás</button>
+    <p id="couponMessage"></p>
+
+    <h3>Aktív kuponok:</h3>
+    <ul id="activeCouponsList" style="list-style:none; padding-left:0;"></ul>
+
+    <hr />
+    
+    <br /><br />
+    <button class="button" onclick="location.href='login.html'">Kijelentkezés</button>
+  </div>
+
+  <script>
+    const currentUser = "Mama";
+
+    const defaultBalances = {
+      "Mama": 5000,
+      "Dani": 5000,
+      "Barni": 5000,
+      "Ádám": 5000,
+      "Kamilla": 5000,
+      "Máté": 5000
+    };
+
+    // Kupon kódok és leírások
+    const coupons = {
+      "1000KEKSZ": "-1000 keksz",
+      "FILMV": "Filmválasztás",
+      "JATEK": "Te választod a játékot",
+      "HOLALSZ": "Hol alszol",
+      "KIVELALSZ": "Kivel alszol",
+      "EBED": "Ebédválasztás",
+      "JATSZOTER": "Játszótér"
+    };
+
+    // --- EGYENLEGEK kezelése ---
+
+    function loadBalances() {
+      let balances = localStorage.getItem("balances");
+      if (!balances) {
+        localStorage.setItem("balances", JSON.stringify(defaultBalances));
+        return {...defaultBalances};
+      } else {
+        return JSON.parse(balances);
+      }
+    }
+
+    function saveBalances(balances) {
+      localStorage.setItem("balances", JSON.stringify(balances));
+    }
+
+    function updateBalanceDisplay() {
+      const balances = loadBalances();
+      document.getElementById("balance").textContent = balances[currentUser].toLocaleString() + " Keksz";
+    }
+
+    function transfer() {
+      const receiver = document.getElementById("receiver").value;
+      const amountInput = document.getElementById("amount");
+      const amount = parseInt(amountInput.value);
+      const message = document.getElementById("message");
+      const balances = loadBalances();
+
+      message.textContent = "";
+      message.className = "";
+
+      if (!receiver || isNaN(amount) || amount <= 0) {
+        message.textContent = "Adj meg érvényes címzettet és összeget.";
+        message.className = "error";
+        return;
+      }
+      if (receiver === currentUser) {
+        message.textContent = "Nem utalhatsz magadnak!";
+        message.className = "error";
+        return;
+      }
+      if (balances[currentUser] < amount) {
+        message.textContent = "Nincs elég egyenleg az utaláshoz!";
+        message.className = "error";
+        return;
+      }
+
+      balances[currentUser] -= amount;
+      balances[receiver] += amount;
+
+      saveBalances(balances);
+      updateBalanceDisplay();
+
+      message.textContent = `Sikeresen utaltál ${amount.toLocaleString()} Ft-ot ${receiver} részére.`;
+      message.className = "success";
+
+      amountInput.value = "";
+      document.getElementById("receiver").selectedIndex = 0;
+    }
+
+    function resetBalances() {
+      localStorage.setItem("balances", JSON.stringify(defaultBalances));
+      updateBalanceDisplay();
+      const message = document.getElementById("message");
+      message.textContent = "Egyenlegek visszaállítva az alapértékekre.";
+      message.className = "success";
+    }
+
+    // --- KUPONOK kezelése ---
+
+    function loadActiveCoupons() {
+      let data = localStorage.getItem("activeCoupons");
+      if (!data) {
+        const obj = {};
+        localStorage.setItem("activeCoupons", JSON.stringify(obj));
+        return obj;
+      } else {
+        return JSON.parse(data);
+      }
+    }
+
+    function saveActiveCoupons(obj) {
+      localStorage.setItem("activeCoupons", JSON.stringify(obj));
+    }
+
+    function showActiveCoupons() {
+      const activeCoupons = loadActiveCoupons();
+      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
+
+      const listEl = document.getElementById("activeCouponsList");
+      listEl.innerHTML = "";
+
+      if (activeCoupons[currentUser].length === 0) {
+        listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
+        return;
+      }
+
+      activeCoupons[currentUser].forEach(code => {
+        const li = document.createElement("li");
+        li.textContent = coupons[code] || code;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Felhasználom";
+        btn.className = "coupon-btn";
+        btn.onclick = () => {
+          useCoupon(code);
+        };
+
+        li.appendChild(btn);
+        listEl.appendChild(li);
+      });
+    }
+
+    function activateCoupon() {
+      const input = document.getElementById("couponCode");
+      const code = input.value.trim().toUpperCase();
+      const msg = document.getElementById("couponMessage");
+
+      msg.textContent = "";
+      msg.className = "";
+
+      if (!code) {
+        msg.textContent = "Kérlek, adj meg egy kuponkódot!";
+        msg.className = "error";
+        return;
+      }
+      if (!(code in coupons)) {
+        msg.textContent = "Érvénytelen kuponkód!";
+        msg.className = "error";
+        return;
+      }
+
+      const activeCoupons = loadActiveCoupons();
+      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
+
+      if (activeCoupons[currentUser].includes(code)) {
+        msg.textContent = "Ezt a kupont már aktiváltad!";
+        msg.className = "error";
+        return;
+      }
+
+      activeCoupons[currentUser].push(code);
+      saveActiveCoupons(activeCoupons);
+
+      msg.textContent = `Sikeresen aktiváltad a kuponodat: ${coupons[code]}`;
+      msg.className = "success";
+
+      input.value = "";
+      showActiveCoupons();
+    }
+
+    function useCoupon(code) {
+      const activeCoupons = loadActiveCoupons();
+      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
+
+      activeCoupons[currentUser] = activeCoupons[currentUser].filter(c => c !== code);
+      saveActiveCoupons(activeCoupons);
+
+      if (code === "1000KEKSZ") {
+        const balances = loadBalances();
+        balances[currentUser] = Math.max(0, balances[currentUser] - 1000);
+        saveBalances(balances);
+        updateBalanceDisplay();
+      }
+
+      const msg = document.getElementById("couponMessage");
+      msg.textContent = `Felhasználtad a kuponodat: ${coupons[code]}`;
+      msg.className = "success";
+
+      showActiveCoupons();
+    }
+
+    updateBalanceDisplay();
+    showActiveCoupons();
+  </script>
+</body>
+</html>
