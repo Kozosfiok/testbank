@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bank Of MAMA Bejelentkezés</title>
+  <title>Bank Of MAMA Dolgozói Bejelentkezés</title>
   <link rel="icon" href="logo.png" type="image/png" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #7097E6;
+      background: #a5ef8b;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -40,7 +40,7 @@
 
     .login-box button {
       padding: 10px 20px;
-      background-color: #7097E6;
+      background-color: #a5ef8b;
       color: white;
       border: none;
       border-radius: 4px;
@@ -48,7 +48,7 @@
     }
 
     .login-box button:hover {
-      background-color: #357ae8;
+      background-color: #c4f98b;
     }
 
     .error {
@@ -71,7 +71,7 @@
   }
 
   body.fade-bg {
-    background-color: #7097E6 !important;
+    background-color: #a5ef8b !important;
     transition: background-color 1s ease;
   }
   .employee-login-box {
@@ -100,8 +100,8 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #7097E6;
-  color: white;
+  background-color: #a5ef8b;
+  color: black;
   text-align: center;
   padding: 6px 0;
   font-size: 13px;
@@ -110,25 +110,23 @@
 }
 
 .site-footer a {
-  color: white;
+  color: black;
   text-decoration: underline;
 }
 
 .site-footer a:hover {
   text-decoration: none;
 }
-
   </style>
 </head>
 <body>
-	<div class="employee-login-box">
-	  <button onclick="window.location.href='login_employee.html'">Dolgozói belépés</button>
-	</div>
   <!-- Logo at the top-right corner -->
   <img src="logo.png" alt="Logo" class="logo">
-
+	<div class="employee-login-box">
+	  <button onclick="window.location.href='login.html'">Sima belépés</button>
+	</div>
   <div class="login-box">
-    <h2>Bejelentkezés a Bank Of MAMA fiókba</h2>
+    <h2>Dolgozói Bejelentkezés</h2>
     <form id="loginForm">
       <input type="text" id="username" placeholder="Felhasználónév" required><br>
       <input type="password" id="password" placeholder="Jelszó" required><br>
@@ -139,12 +137,8 @@
 
   <script>
   const accounts = [
-    { username: 'Máté', password: '12345678', page: 'mate.html' },
-    { username: 'Dani', password: '00000000', page: 'dani.html' },
-    { username: 'Barni', password: '1234', page: 'barni.html' },
-    { username: 'Ádám', password: '2013', page: 'adam.html' },
-    { username: 'Kamilla', password: '0513', page: 'kamilla.html' },
-    { username: 'Mama', password: '0114', page: 'mama.html' },
+    { username: 'Munkás', password: '12345678', page: 'dolgozoi.html' },
+    { username: 'admin', password: 'admin1234', page: 'admin.html' },
   ];
 
   document.getElementById('loginForm').addEventListener('submit', function(e) {

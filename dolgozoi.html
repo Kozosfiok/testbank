@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dolgozói oldal - QR kód beolvasás</title>
+  <link rel="icon" href="icon.png" />
+    <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #7097E6;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      color: white;
+    }
+    .logo {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+    video {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    #output {
+      margin-top: 15px;
+      font-size: 1.2em;
+      font-weight: bold;
+      min-height: 1.5em;
+    }
+    #inputForm {
+      background: white;
+      color: black;
+      max-width: 400px;
+      margin: 30px auto 0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      display: none;
+      text-align: left;
+    }
+    #inputForm input, #inputForm select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    #inputForm button {
+      padding: 10px 20px;
+      background-color: #7097E6;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #inputForm button:hover {
+      background-color: #357ae8;
+    }
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .error {
+      color: #ff4444;
+    }
+    .success {
+      color: #4CAF50;
+    }
+	.logout-box {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+.logout-box button {
+  background-color: transparent;
+  border: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.logout-box button:hover {
+  text-decoration: underline;
+}
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #7097E6;
+  color: white;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.site-footer a {
+  color: white;
+  text-decoration: underline;
+}
+
+.site-footer a:hover {
+  text-decoration: none;
+}
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="Logo" class="logo" />
+  <div class="logout-box">
+  <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
+</div>
+  <h1>QR kód beolvasás - Dolgozói oldal</h1>
+  <video id="video" muted playsinline></video>
+  <div id="output">QR kód beolvasása...</div>
+
+  <div id="inputForm">
+    <h2 id="userTitle"></h2>
+    <label for="amount">Keksz (kézpénz) összege (Ft):</label>
+    <input type="number" id="amount" placeholder="Pl. 5000" min="0" />
+
+    <label for="couponSelect">Kupon hozzáadása:</label>
+    <select id="couponSelect">
+      <option value="">-- Válassz kupont --</option>
+      <option value="1000KEKSZ">-1000 keksz</option>
+      <option value="FILMV">Filmválasztás</option>
+      <option value="JATEK">Te választod a játékot</option>
+      <option value="HOLALSZ">Hol alszol</option>
+      <option value="KIVELALSZ">Kivel alszol</option>
+      <option value="EBED">Ebédválasztás</option>
+      <option value="JATSZOTER">Játszótér</option>
+    </select>
+
+    <button onclick="submitCash()">Beküldés</button>
+    <div id="message"></div>
+    <button onclick="resetForm()" style="margin-top:10px;">Új beolvasás</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+      authDomain: "jatekbank-89289.firebaseapp.com",
+      databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+      projectId: "jatekbank-89289",
+      storageBucket: "jatekbank-89289.firebasestorage.app",
+      messagingSenderId: "77741361269",
+      appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+      measurementId: "G-B76FVR2187"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const video = document.getElementById("video");
+    const output = document.getElementById("output");
+    const inputForm = document.getElementById("inputForm");
+    const userTitle = document.getElementById("userTitle");
+    const amountInput = document.getElementById("amount");
+    const couponSelect = document.getElementById("couponSelect");
+    const messageDiv = document.getElementById("message");
+
+    let scanning = false;
+    let scannedUser = null;
+
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+          video.srcObject = stream;
+          video.setAttribute("playsinline", true);
+          video.play();
+
+          video.onloadedmetadata = () => {
+            scanning = true;
+            scanFrame();
+          };
+        })
+        .catch(err => {
+          output.textContent = "Nem sikerült elindítani a kamerát: " + err;
+        });
+    }
+
+    function scanFrame() {
+      if (!scanning) return;
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        if (canvas.width === 0 || canvas.height === 0) {
+          requestAnimationFrame(scanFrame);
+          return;
+        }
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, canvas.width, canvas.height, {
+          inversionAttempts: "dontInvert",
+        });
+
+        if (code) {
+          const candidateUser = code.data.trim();
+
+          // Ellenőrzés Firebase-ben, létezik-e a fiók
+          db.ref("balances/" + candidateUser).get().then(snapshot => {
+            if (snapshot.exists()) {
+              scannedUser = candidateUser;
+              output.textContent = `Beolvasott név: ${scannedUser}`;
+              scanning = false;
+              video.srcObject.getTracks().forEach(track => track.stop());
+              showInputForm(scannedUser);
+            } else {
+              output.textContent = `Nincs ilyen fiók: ${candidateUser}`;
+              // 3 mp múlva újraindítjuk a beolvasást
+              setTimeout(() => {
+                output.textContent = "QR kód beolvasása...";
+                scanFrame();
+              }, 3000);
+            }
+          }).catch(err => {
+            output.textContent = "Hiba történt a fiók ellenőrzésekor: " + err;
+          });
+        } else {
+          requestAnimationFrame(scanFrame);
+        }
+      } else {
+        requestAnimationFrame(scanFrame);
+      }
+    }
+
+    function showInputForm(user) {
+      userTitle.textContent = `${user} fiókja`;
+      inputForm.style.display = "block";
+      amountInput.value = "";
+      couponSelect.value = "";
+      messageDiv.textContent = "";
+      messageDiv.className = "";
+    }
+
+    function submitCash() {
+      const amount = parseInt(amountInput.value);
+      const coupon = couponSelect.value;
+      if ((isNaN(amount) || amount < 0) && coupon === "") {
+        messageDiv.textContent = "Adj meg összeget vagy válassz kupont!";
+        messageDiv.className = "error";
+        return;
+      }
+
+      const updates = {};
+
+      if (!isNaN(amount) && amount > 0) {
+        db.ref("balances/" + scannedUser).once("value").then(snapshot => {
+          const currentBalance = snapshot.val() || 0;
+          updates["balances/" + scannedUser] = currentBalance + amount;
+
+          if (coupon !== "") {
+            updates["coupons/" + scannedUser + "/" + coupon] = true;
+          }
+
+          return db.ref().update(updates);
+        }).then(() => {
+          messageDiv.textContent = "Sikeres feltöltés!";
+          messageDiv.className = "success";
+          setTimeout(() => {
+            resetForm();
+          }, 2000);
+        }).catch(err => {
+          messageDiv.textContent = "Hiba történt az adatküldéskor: " + err;
+          messageDiv.className = "error";
+        });
+      } else if (coupon !== "") {
+        // Csak kupon
+        updates["coupons/" + scannedUser + "/" + coupon] = true;
+        db.ref().update(updates).then(() => {
+          messageDiv.textContent = "Kupon sikeresen hozzáadva!";
+          messageDiv.className = "success";
+          setTimeout(() => {
+            resetForm();
+          }, 2000);
+        }).catch(err => {
+          messageDiv.textContent = "Hiba történt az adatküldéskor: " + err;
+          messageDiv.className = "error";
+        });
+      }
+    }
+
+    function resetForm() {
+      inputForm.style.display = "none";
+      output.textContent = "QR kód beolvasása...";
+      scannedUser = null;
+      startCamera();
+    }
+
+    window.onload = () => {
+      startCamera();
+    };
+  </script>
+  <footer class="site-footer">
+  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+</footer>
+</body>
+</html>

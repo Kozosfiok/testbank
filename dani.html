@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dani bankja</title>
+  <link rel="icon" href="icon.png">
     <link rel="icon" href="logo.png" type="image/png" />
   <style>
     body {
@@ -43,7 +45,6 @@
       color: green;
       font-weight: bold;
     }
-    /* Logo Styling */
     .logo {
       position: absolute;
       top: 20px;
@@ -51,7 +52,6 @@
       width: 150px;
       height: 150px;
     }
-    /* Kupon lista gomb */
     .coupon-btn {
       margin-left: 10px;
       background-color: #4CAF50;
@@ -61,7 +61,113 @@
     .coupon-btn:hover {
       background-color: #388E3C;
     }
+	/* Mobilbarát alap stílusok */
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #7097E6;
+  text-align: center;
+}
+
+.card {
+  max-width: 400px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+input, select, button {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #7097E6;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #357ae8;
+}
+
+/* Kis képernyőn nagyobb padding, stb. */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  .card {
+    padding: 15px;
+  }
+}
+.epass-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.epass-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.epass-card:hover {
+  transform: scale(1.03);
+}
+
+.epass-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.epass-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #7097E6;
+  color: white;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.site-footer a {
+  color: white;
+  text-decoration: underline;
+}
+
+.site-footer a:hover {
+  text-decoration: none;
+}
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
   <img src="logo.png" alt="Logo" class="logo">
@@ -72,11 +178,11 @@
     <h3>Utalás</h3>
     <select id="receiver">
       <option value="" disabled selected>Válassz címzettet</option>
-      <option value="Ádám">Ádám</option>
+      <option value="Máté">Máté</option>
       <option value="Barni">Barni</option>
+      <option value="Ádám">Ádám</option>
       <option value="Kamilla">Kamilla</option>
       <option value="Mama">Mama</option>
-      <option value="Máté">Máté</option>
     </select><br />
     <input type="number" id="amount" placeholder="Összeg Ft-ban" /><br />
     <button class="button" onclick="transfer()">Utalás</button>
@@ -85,7 +191,6 @@
 
     <hr />
 
-    <!-- Kupon rész -->
     <h3>Kupon beváltása</h3>
     <input type="text" id="couponCode" placeholder="Írd be a kuponkódot" />
     <button class="button" onclick="activateCoupon()">Beváltás</button>
@@ -94,22 +199,47 @@
     <h3>Aktív kuponok:</h3>
     <ul id="activeCouponsList" style="list-style:none; padding-left:0;"></ul>
 
-    <hr />
+    <br /><br />
+	<hr style="margin: 40px 0; border: none; border-top: 2px solid #d0d0d0;">
+
+<h2 style="text-align: center; color: #333;">Digitális E-Pass kártya</h2>
+
+<div class="epass-container">
+  <div class="epass-card">
+    <img src="Dani.png" alt="Dani E-Pass" class="epass-image">
+    <p class="epass-name">Dani</p>
+  </div>
     <button class="button" onclick="location.href='login.html'">Kijelentkezés</button>
+  <!-- Add more epass-cards for other users (Barni, Dani, etc.) -->
+</div>
+
   </div>
 
   <script>
+    const firebaseConfig = {
+
+  apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+
+  authDomain: "jatekbank-89289.firebaseapp.com",
+
+  databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+
+  projectId: "jatekbank-89289",
+
+  storageBucket: "jatekbank-89289.firebasestorage.app",
+
+  messagingSenderId: "77741361269",
+
+  appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+
+  measurementId: "G-B76FVR2187"
+
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const currentUser = "Dani";
-
-    const defaultBalances = {
-      "Máté": 5000,
-      "Dani": 5000,
-      "Barni": 5000,
-      "Ádám": 5000,
-      "Kamilla": 5000,
-      "Mama": 5000
-    };
-
+    const users = ["Máté", "Dani", "Barni", "Ádám", "Kamilla", "Mama"];
     const coupons = {
       "1000KEKSZ": "-1000 keksz",
       "FILMV": "Filmválasztás",
@@ -120,168 +250,108 @@
       "JATSZOTER": "Játszótér"
     };
 
-    function loadBalances() {
-      let balances = localStorage.getItem("balances");
-      if (!balances) {
-        localStorage.setItem("balances", JSON.stringify(defaultBalances));
-        return {...defaultBalances};
-      } else {
-        return JSON.parse(balances);
-      }
-    }
-
-    function saveBalances(balances) {
-      localStorage.setItem("balances", JSON.stringify(balances));
-    }
-
     function updateBalanceDisplay() {
-      const balances = loadBalances();
-      document.getElementById("balance").textContent = balances[currentUser].toLocaleString() + " Keksz";
+      db.ref("balances/" + currentUser).on("value", snap => {
+        const value = snap.val();
+        document.getElementById("balance").textContent = value.toLocaleString() + " Ft";
+      });
     }
 
     function transfer() {
       const receiver = document.getElementById("receiver").value;
-      const amountInput = document.getElementById("amount");
-      const amount = parseInt(amountInput.value);
+      const amount = parseInt(document.getElementById("amount").value);
       const message = document.getElementById("message");
-      const balances = loadBalances();
 
-      message.textContent = "";
-      message.className = "";
-
-      if (!receiver || isNaN(amount) || amount <= 0) {
-        message.textContent = "Adj meg érvényes címzettet és összeget.";
-        message.className = "error";
-        return;
-      }
-      if (receiver === currentUser) {
-        message.textContent = "Nem utalhatsz magadnak!";
-        message.className = "error";
-        return;
-      }
-      if (balances[currentUser] < amount) {
-        message.textContent = "Nincs elég egyenleg az utaláshoz!";
+      if (!receiver || isNaN(amount) || amount <= 0 || receiver === currentUser) {
+        message.textContent = "Adj meg érvényes adatokat!";
         message.className = "error";
         return;
       }
 
-      balances[currentUser] -= amount;
-      balances[receiver] += amount;
-
-      saveBalances(balances);
-      updateBalanceDisplay();
-
-      message.textContent = `Sikeresen utaltál ${amount.toLocaleString()} Ft-ot ${receiver} részére.`;
-      message.className = "success";
-
-      amountInput.value = "";
-      document.getElementById("receiver").selectedIndex = 0;
+      db.ref("balances").once("value").then(snapshot => {
+        const data = snapshot.val();
+        if (data[currentUser] < amount) {
+          message.textContent = "Nincs elég egyenleg!";
+          message.className = "error";
+          return;
+        }
+        db.ref("balances/" + currentUser).set(data[currentUser] - amount);
+        db.ref("balances/" + receiver).set(data[receiver] + amount);
+        message.textContent = `Sikeres utalás: ${amount} Ft ${receiver} részére.`;
+        message.className = "success";
+        document.getElementById("amount").value = "";
+        document.getElementById("receiver").selectedIndex = 0;
+      });
     }
 
-    function loadActiveCoupons() {
-      let data = localStorage.getItem("activeCoupons");
-      if (!data) {
-        const obj = {};
-        localStorage.setItem("activeCoupons", JSON.stringify(obj));
-        return obj;
-      } else {
-        return JSON.parse(data);
-      }
-    }
-
-    function saveActiveCoupons(obj) {
-      localStorage.setItem("activeCoupons", JSON.stringify(obj));
-    }
-
-    function showActiveCoupons() {
-      const activeCoupons = loadActiveCoupons();
-      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
-
-      const listEl = document.getElementById("activeCouponsList");
-      listEl.innerHTML = "";
-
-      if (activeCoupons[currentUser].length === 0) {
-        listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
-        return;
-      }
-
-      activeCoupons[currentUser].forEach(code => {
-        const li = document.createElement("li");
-        li.textContent = coupons[code] || code;
-
-        const btn = document.createElement("button");
-        btn.textContent = "Felhasználom";
-        btn.className = "coupon-btn";
-        btn.onclick = () => {
-          useCoupon(code);
-        };
-
-        li.appendChild(btn);
-        listEl.appendChild(li);
+    function resetBalances() {
+      users.forEach(user => {
+        db.ref("balances/" + user).set(5000);
       });
     }
 
     function activateCoupon() {
-      const input = document.getElementById("couponCode");
-      const code = input.value.trim().toUpperCase();
+      const code = document.getElementById("couponCode").value.trim().toUpperCase();
       const msg = document.getElementById("couponMessage");
-
-      msg.textContent = "";
-      msg.className = "";
-
-      if (!code) {
-        msg.textContent = "Kérlek, adj meg egy kuponkódot!";
-        msg.className = "error";
-        return;
-      }
-      if (!(code in coupons)) {
+      if (!code || !(code in coupons)) {
         msg.textContent = "Érvénytelen kuponkód!";
         msg.className = "error";
         return;
       }
 
-      const activeCoupons = loadActiveCoupons();
-      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
+      db.ref("coupons/" + currentUser + "/" + code).once("value", snap => {
+        if (snap.exists()) {
+          msg.textContent = "Már aktiváltad ezt a kupont!";
+          msg.className = "error";
+        } else {
+          db.ref("coupons/" + currentUser + "/" + code).set(true);
+          msg.textContent = `Kupon aktiválva: ${coupons[code]}`;
+          msg.className = "success";
+          showActiveCoupons();
+        }
+      });
+    }
 
-      if (activeCoupons[currentUser].includes(code)) {
-        msg.textContent = "Ezt a kupont már aktiváltad!";
-        msg.className = "error";
-        return;
-      }
-
-      activeCoupons[currentUser].push(code);
-      saveActiveCoupons(activeCoupons);
-
-      msg.textContent = `Sikeresen aktiváltad a kuponodat: ${coupons[code]}`;
-      msg.className = "success";
-
-      input.value = "";
-      showActiveCoupons();
+    function showActiveCoupons() {
+      const listEl = document.getElementById("activeCouponsList");
+      listEl.innerHTML = "";
+      db.ref("coupons/" + currentUser).once("value", snap => {
+        const data = snap.val();
+        if (!data) {
+          listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
+          return;
+        }
+        for (const code in data) {
+          const li = document.createElement("li");
+          li.textContent = coupons[code] || code;
+          const btn = document.createElement("button");
+          btn.textContent = "Felhasználom";
+          btn.className = "coupon-btn";
+          btn.onclick = () => useCoupon(code);
+          li.appendChild(btn);
+          listEl.appendChild(li);
+        }
+      });
     }
 
     function useCoupon(code) {
-      const activeCoupons = loadActiveCoupons();
-      if (!activeCoupons[currentUser]) activeCoupons[currentUser] = [];
-
-      activeCoupons[currentUser] = activeCoupons[currentUser].filter(c => c !== code);
-      saveActiveCoupons(activeCoupons);
-
+      db.ref("coupons/" + currentUser + "/" + code).remove();
       if (code === "1000KEKSZ") {
-        const balances = loadBalances();
-        balances[currentUser] = Math.max(0, balances[currentUser] - 1000);
-        saveBalances(balances);
-        updateBalanceDisplay();
+        db.ref("balances/" + currentUser).once("value", snap => {
+          const bal = Math.max(0, snap.val() - 1000);
+          db.ref("balances/" + currentUser).set(bal);
+        });
       }
-
-      const msg = document.getElementById("couponMessage");
-      msg.textContent = `Felhasználtad a kuponodat: ${coupons[code]}`;
-      msg.className = "success";
-
+      document.getElementById("couponMessage").textContent = `Felhasználtad: ${coupons[code]}`;
+      document.getElementById("couponMessage").className = "success";
       showActiveCoupons();
     }
 
     updateBalanceDisplay();
     showActiveCoupons();
   </script>
+  <footer class="site-footer">
+  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+</footer>
 </body>
 </html>

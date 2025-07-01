@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin felület - Bank</title>
+  <link rel="icon" href="icon.png" />
+    <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #7097E6;
+      padding: 20px;
+      text-align: center;
+    }
+    .user-card {
+      background: white;
+      margin: 15px auto;
+      max-width: 500px;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+    input, select, button {
+      padding: 8px;
+      margin: 5px 0;
+      font-size: 1em;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+      background-color: #7097E6;
+      color: white;
+      border: none;
+      margin-top: 5px;
+    }
+    button:hover {
+      background-color: #357ae8;
+    }
+    .coupon-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 8px;
+      margin-left: 5px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .coupon-btn.remove {
+      background-color: #e53935;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+	/* Logo Styling */
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 150px; /* Increased size */
+      height: 150px; /* Increased size */
+    }
+		.logout-box {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+.logout-box button {
+  background-color: transparent;
+  border: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.logout-box button:hover {
+  text-decoration: underline;
+}
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #7097E6;
+  color: white;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.site-footer a {
+  color: white;
+  text-decoration: underline;
+}
+
+.site-footer a:hover {
+  text-decoration: none;
+}
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <img src="logo.png" alt="Logo" class="logo" />
+    <div class="logout-box">
+  <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
+</div>
+  <h1>Admin felület</h1>
+  <div id="usersContainer"></div>
+  <script>
+    // Firebase konfiguráció - cseréld a sajátodra!
+    const firebaseConfig = {
+
+    apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+
+    authDomain: "jatekbank-89289.firebaseapp.com",
+
+    databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+
+    projectId: "jatekbank-89289",
+
+    storageBucket: "jatekbank-89289.firebasestorage.app",
+
+    messagingSenderId: "77741361269",
+
+    appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+
+    measurementId: "G-B76FVR2187"
+
+  };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const users = ["Máté", "Dani", "Barni", "Ádám", "Kamilla", "Mama"];
+    const coupons = {
+      "1000KEKSZ": "-1000 keksz",
+      "FILMV": "Filmválasztás",
+      "JATEK": "Te választod a játékot",
+      "HOLALSZ": "Hol alszol",
+      "KIVELALSZ": "Kivel alszol",
+      "EBED": "Ebédválasztás",
+      "JATSZOTER": "Játszótér"
+    };
+
+    // Felhasználók megjelenítése admin felületen
+    function loadUsers() {
+      const container = document.getElementById("usersContainer");
+      container.innerHTML = "";
+      users.forEach(user => {
+        // Egyenleg és kuponok lekérése egyszerre
+        Promise.all([
+          db.ref("balances/" + user).once("value"),
+          db.ref("coupons/" + user).once("value")
+        ]).then(([balanceSnap, couponsSnap]) => {
+          const balance = balanceSnap.val() ?? 0;
+          const userCoupons = couponsSnap.val() || {};
+
+          // HTML építése
+          const userDiv = document.createElement("div");
+          userDiv.className = "user-card";
+
+          userDiv.innerHTML = `
+            <h2>${user}</h2>
+            <div class="section">
+              <label>Egyenleg módosítása (Ft):</label>
+              <input type="number" id="balanceInput_${user}" value="${balance}" />
+              <button onclick="updateBalance('${user}')">Mentés</button>
+            </div>
+            <div class="section">
+              <label>Kupon hozzáadása:</label>
+              <select id="couponAddSelect_${user}">
+                <option value="" selected disabled>Válassz kupont</option>
+                ${Object.entries(coupons).map(([code, desc]) =>
+                  `<option value="${code}">${desc} (${code})</option>`
+                ).join('')}
+              </select>
+              <button onclick="addCoupon('${user}')">Hozzáadás</button>
+            </div>
+            <div class="section">
+              <label>Aktív kuponok:</label>
+              <ul id="couponList_${user}" style="list-style:none; padding-left:0;">
+                ${Object.keys(userCoupons).map(code => `
+                  <li>
+                    ${coupons[code] || code}
+                    <button class="coupon-btn remove" onclick="removeCoupon('${user}', '${code}')">Eltávolít</button>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          `;
+          container.appendChild(userDiv);
+        });
+      });
+    }
+
+    // Egyenleg módosítása
+    function updateBalance(user) {
+      const input = document.getElementById(`balanceInput_${user}`);
+      const value = parseInt(input.value);
+      if (isNaN(value) || value < 0) {
+        alert("Adj meg érvényes, nem negatív összeget!");
+        return;
+      }
+      db.ref("balances/" + user).set(value)
+        .then(() => alert(`${user} egyenlege frissítve.`))
+        .catch(() => alert("Hiba történt az egyenleg mentésekor."));
+    }
+
+    // Kupon hozzáadása
+    function addCoupon(user) {
+      const select = document.getElementById(`couponAddSelect_${user}`);
+      const code = select.value;
+      if (!code) {
+        alert("Válassz kupont!");
+        return;
+      }
+      db.ref("coupons/" + user + "/" + code).set(true)
+        .then(() => {
+          alert(`${coupons[code]} hozzáadva ${user}-hez.`);
+          loadUsers(); // frissítés
+        })
+        .catch(() => alert("Hiba történt a kupon hozzáadásakor."));
+    }
+
+    // Kupon eltávolítása
+    function removeCoupon(user, code) {
+      if (!confirm(`Biztosan eltávolítod ezt a kupont: ${coupons[code]} - ${user}?`)) return;
+      db.ref("coupons/" + user + "/" + code).remove()
+        .then(() => {
+          alert(`Kupon eltávolítva ${user}-től.`);
+          loadUsers(); // frissítés
+        })
+        .catch(() => alert("Hiba történt a kupon eltávolításakor."));
+    }
+
+    loadUsers();
+  </script>
+  <footer class="site-footer">
+  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+</footer>
+</body>
+</html>
