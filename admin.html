@@ -1,258 +1,555 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin felület - Bank</title>
-  <link rel="icon" href="icon.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin felület - Bank</title>
+    <link rel="icon" href="icon.png" />
     <link rel="icon" href="logo.png" type="image/png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #7097E6;
-      padding: 20px;
-      text-align: center;
-    }
-    .user-card {
-      background: white;
-      margin: 15px auto;
-      max-width: 500px;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      text-align: left;
-    }
-    input, select, button {
-      padding: 8px;
-      margin: 5px 0;
-      font-size: 1em;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      cursor: pointer;
-      background-color: #7097E6;
-      color: white;
-      border: none;
-      margin-top: 5px;
-    }
-    button:hover {
-      background-color: #357ae8;
-    }
-    .coupon-btn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 5px 8px;
-      margin-left: 5px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-    .coupon-btn.remove {
-      background-color: #e53935;
-    }
-    h2 {
-      margin-bottom: 10px;
-    }
-    .section {
-      margin-bottom: 30px;
-    }
-	/* Logo Styling */
-    .logo {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 150px; /* Increased size */
-      height: 150px; /* Increased size */
-    }
-		.logout-box {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
-  z-index: 1000;
-}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Admin page color scheme (can be unique or match main login) */
+            --primary-accent: #8A2BE2; /* A vibrant purple/blue-violet */
+            --primary-accent-hover: #7b1cd1; /* Darker on hover */
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --text-color-light: #fff;
+            --text-color-dark: #333;
+            --success-coupon-btn: #4CAF50;
+            --success-coupon-btn-hover: #45a049;
+            --remove-coupon-btn: #e53935;
+            --remove-coupon-btn-hover: #c62828;
+        }
 
-.logout-box button {
-  background-color: transparent;
-  border: none;
-  color: #333;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            justify-content: flex-start; /* Align content to the top */
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #8A2BE2, #4A90E2, #FF6F61, #FFD000); /* Purple-ish gradient */
+            background-size: 400% 400%;
+            animation: adminBackground 15s ease infinite; /* New animation for admin */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative;
+            padding-bottom: 70px; /* Space for fixed footer */
+        }
 
-.logout-box button:hover {
-  text-decoration: underline;
-}
-.site-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #7097E6;
-  color: white;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 13px;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
+        @keyframes adminBackground { /* Admin specific background animation */
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-.site-footer a {
-  color: white;
-  text-decoration: underline;
-}
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
 
-.site-footer a:hover {
-  text-decoration: none;
-}
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+        .logo {
+            position: fixed; /* Use fixed for consistency */
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: auto; /* Maintain aspect ratio */
+            object-fit: contain;
+            z-index: 2;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .logout-box {
+            position: fixed; /* Use fixed for consistency */
+            top: 30px;
+            left: 30px;
+            padding: 0;
+            z-index: 2;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .logout-box button {
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: var(--text-color-light);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .logout-box button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--text-color-light);
+            transform: translateY(-2px);
+        }
+        .logout-box button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            color: var(--text-color-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 2.2em;
+            margin-top: 100px; /* Space for fixed elements */
+            margin-bottom: 40px;
+        }
+
+        .user-card {
+            margin: 15px auto;
+            max-width: 550px; /* Slightly wider cards */
+            padding: 30px; /* More padding */
+            text-align: left;
+            color: var(--text-color-dark);
+            animation: fadeIn 0.8s ease-out;
+            width: calc(100% - 40px); /* Allow card to take more width, accounting for body padding */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-card h2 {
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-accent); /* Accent color for user name */
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 25px; /* Spacing between sections */
+            padding-bottom: 15px;
+            border-bottom: 1px dashed rgba(0,0,0,0.1); /* Subtle separator */
+        }
+        .section:last-child {
+            border-bottom: none; /* No separator for the last section */
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.05em;
+            color: var(--text-color-dark);
+        }
+
+        input[type="number"],
+        select {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f8f8;
+            transition: all 0.3s ease;
+            color: var(--text-color-dark);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.3); /* Accent color focus */
+            background-color: #fff;
+        }
+
+        /* Custom arrow for select */
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8em;
+            color: #888;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            position: absolute;
+            pointer-events: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-top: 10px; /* Adjusted margin */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        button:hover {
+            background-color: var(--primary-accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.5); /* Custom focus */
+        }
+
+        .coupon-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+
+        .coupon-list li {
+            background-color: rgba(0,0,0,0.05); /* Light background for each coupon */
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+            color: var(--text-color-dark);
+        }
+
+        .coupon-btn {
+            padding: 6px 10px; /* Slightly larger buttons */
+            margin-left: 10px;
+            border-radius: 6px; /* Match list item radius */
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            outline: none;
+            width: auto; /* Override 100% width */
+        }
+
+        .coupon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .coupon-btn.add-btn { /* For the general add coupon button if needed */
+            background-color: var(--success-coupon-btn);
+        }
+        .coupon-btn.add-btn:hover {
+            background-color: var(--success-coupon-btn-hover);
+        }
+
+        .coupon-btn.remove {
+            background-color: var(--remove-coupon-btn);
+        }
+        .coupon-btn.remove:hover {
+            background-color: var(--remove-coupon-btn-hover);
+        }
+        .coupon-btn:focus {
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Generic focus for coupon buttons */
+        }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-color-light);
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            z-index: 10;
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .site-footer p {
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .site-footer a {
+            color: #C0E0FF; /* Light blue for links */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: var(--text-color-light);
+            text-decoration: underline;
+        }
+
+        /* --- Media Queries for Responsiveness --- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+                margin-top: 70px;
+                margin-bottom: 30px;
+            }
+            .logo {
+                width: 90px;
+                top: 20px;
+                right: 20px;
+            }
+            .logout-box {
+                top: 20px;
+                left: 20px;
+            }
+            .logout-box button {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .user-card {
+                padding: 25px;
+                max-width: 95%; /* Adjust width for smaller screens */
+            }
+            .user-card h2 {
+                font-size: 1.5em;
+            }
+            label {
+                font-size: 1em;
+            }
+            input[type="number"], select, button {
+                font-size: 0.95em;
+                padding: 10px;
+            }
+            .coupon-list li {
+                font-size: 0.9em;
+                padding: 7px 10px;
+            }
+            .coupon-btn {
+                font-size: 0.8em;
+                padding: 5px 8px;
+            }
+            .site-footer {
+                padding: 10px 0;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+                margin-top: 60px;
+                margin-bottom: 20px;
+            }
+            .logo {
+                width: 70px;
+                top: 15px;
+                right: 15px;
+            }
+            .logout-box {
+                top: 15px;
+                left: 15px;
+            }
+            .logout-box button {
+                font-size: 12px;
+                padding: 7px 10px;
+            }
+            .user-card {
+                padding: 20px;
+                max-width: 100%; /* Take full width on very small screens */
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            .user-card h2 {
+                font-size: 1.3em;
+            }
+            label {
+                font-size: 0.95em;
+            }
+            input[type="number"], select, button {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .coupon-list li {
+                font-size: 0.85em;
+                padding: 6px 8px;
+            }
+            .coupon-btn {
+                font-size: 0.75em;
+                padding: 4px 7px;
+            }
+            .site-footer {
+                padding: 8px 0;
+                font-size: 12px;
+            }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
-  <img src="logo.png" alt="Logo" class="logo" />
-    <div class="logout-box">
-  <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
-</div>
-  <h1>Admin felület</h1>
-  <div id="usersContainer"></div>
-  <script>
-    // Firebase konfiguráció - cseréld a sajátodra!
-    const firebaseConfig = {
+    <img src="logo.png" alt="Logo" class="logo" />
+    <div class="logout-box glass-effect">
+        <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
+    </div>
+    <h1>Admin felület</h1>
+    <div id="usersContainer"></div>
 
-    apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    authDomain: "jatekbank-89289.firebaseapp.com",
+        const users = ["Máté", "Dani", "Barni", "Ádám", "Kamilla", "Mama"];
+        const coupons = {
+            "1000KEKSZ": "-1000 keksz",
+            "FILMV": "Filmválasztás",
+            "JATEK": "Te választod a játékot",
+            "HOLALSZ": "Hol alszol",
+            "KIVELALSZ": "Kivel alszol",
+            "EBED": "Ebédválasztás",
+            "JATSZOTER": "Játszótér"
+        };
 
-    databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+        function loadUsers() {
+            const container = document.getElementById("usersContainer");
+            container.innerHTML = "";
+            users.forEach(user => {
+                Promise.all([
+                    db.ref("balances/" + user).once("value"),
+                    db.ref("coupons/" + user).once("value")
+                ]).then(([balanceSnap, couponsSnap]) => {
+                    const balance = balanceSnap.val() ?? 0;
+                    const userCoupons = couponsSnap.val() || {};
 
-    projectId: "jatekbank-89289",
+                    const userDiv = document.createElement("div");
+                    userDiv.className = "user-card glass-effect"; /* Apply glassmorphism */
 
-    storageBucket: "jatekbank-89289.firebasestorage.app",
+                    userDiv.innerHTML = `
+                        <h2>${user}</h2>
+                        <div class="section">
+                            <label for="balanceInput_${user}">Egyenleg módosítása (Ft):</label>
+                            <input type="number" id="balanceInput_${user}" value="${balance}" min="0" />
+                            <button onclick="updateBalance('${user}')">Mentés</button>
+                        </div>
+                        <div class="section">
+                            <label for="couponAddSelect_${user}">Kupon hozzáadása:</label>
+                            <div class="select-wrapper">
+                                <select id="couponAddSelect_${user}">
+                                    <option value="" selected disabled>Válassz kupont</option>
+                                    ${Object.entries(coupons).map(([code, desc]) => {
+                                        // Disable already active coupons in the dropdown
+                                        return userCoupons[code] ?
+                                            `<option value="${code}" disabled>${desc} (${code}) - Már Aktív</option>` :
+                                            `<option value="${code}">${desc} (${code})</option>`;
+                                    }).join('')}
+                                </select>
+                            </div>
+                            <button onclick="addCoupon('${user}')">Hozzáadás</button>
+                        </div>
+                        <div class="section">
+                            <label>Aktív kuponok:</label>
+                            <ul id="couponList_${user}" class="coupon-list">
+                                ${Object.keys(userCoupons).length > 0 ?
+                                    Object.keys(userCoupons).map(code => `
+                                        <li>
+                                            ${coupons[code] || code}
+                                            <button class="coupon-btn remove" onclick="removeCoupon('${user}', '${code}')">Eltávolít</button>
+                                        </li>
+                                    `).join('') :
+                                    `<li>Nincsenek aktív kuponok.</li>`
+                                }
+                            </ul>
+                        </div>
+                    `;
+                    container.appendChild(userDiv);
+                });
+            });
+        }
 
-    messagingSenderId: "77741361269",
+        function updateBalance(user) {
+            const input = document.getElementById(`balanceInput_${user}`);
+            const value = parseInt(input.value);
+            if (isNaN(value) || value < 0) {
+                alert("Adj meg érvényes, nem negatív összeget!");
+                return;
+            }
+            db.ref("balances/" + user).set(value)
+                .then(() => alert(`${user} egyenlege sikeresen frissítve.`))
+                .catch(() => alert("Hiba történt az egyenleg mentésekor."));
+        }
 
-    appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+        function addCoupon(user) {
+            const select = document.getElementById(`couponAddSelect_${user}`);
+            const code = select.value;
+            if (!code) {
+                alert("Válassz kupont!");
+                return;
+            }
+            // Check if coupon already exists
+            db.ref("coupons/" + user + "/" + code).once("value").then(snapshot => {
+                if (snapshot.exists() && snapshot.val() === true) {
+                    alert("Ez a kupon már hozzá van rendelve ehhez a felhasználóhoz!");
+                    return Promise.reject("Coupon already exists"); // Reject to stop the chain
+                }
+                return db.ref("coupons/" + user + "/" + code).set(true);
+            })
+            .then(() => {
+                alert(`${coupons[code]} hozzáadva ${user}-hez.`);
+                loadUsers(); // Refresh the list
+            })
+            .catch(error => {
+                if (error !== "Coupon already exists") { // Only show alert for actual errors
+                    alert("Hiba történt a kupon hozzáadásakor: " + error.message);
+                }
+            });
+        }
 
-    measurementId: "G-B76FVR2187"
+        function removeCoupon(user, code) {
+            if (!confirm(`Biztosan eltávolítod ezt a kupont: ${coupons[code] || code} - ${user} felhasználótól?`)) return;
+            db.ref("coupons/" + user + "/" + code).remove()
+                .then(() => {
+                    alert(`Kupon eltávolítva ${user}-től.`);
+                    loadUsers(); // Refresh the list
+                })
+                .catch(() => alert("Hiba történt a kupon eltávolításakor."));
+        }
 
-  };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const users = ["Máté", "Dani", "Barni", "Ádám", "Kamilla", "Mama"];
-    const coupons = {
-      "1000KEKSZ": "-1000 keksz",
-      "FILMV": "Filmválasztás",
-      "JATEK": "Te választod a játékot",
-      "HOLALSZ": "Hol alszol",
-      "KIVELALSZ": "Kivel alszol",
-      "EBED": "Ebédválasztás",
-      "JATSZOTER": "Játszótér"
-    };
-
-    // Felhasználók megjelenítése admin felületen
-    function loadUsers() {
-      const container = document.getElementById("usersContainer");
-      container.innerHTML = "";
-      users.forEach(user => {
-        // Egyenleg és kuponok lekérése egyszerre
-        Promise.all([
-          db.ref("balances/" + user).once("value"),
-          db.ref("coupons/" + user).once("value")
-        ]).then(([balanceSnap, couponsSnap]) => {
-          const balance = balanceSnap.val() ?? 0;
-          const userCoupons = couponsSnap.val() || {};
-
-          // HTML építése
-          const userDiv = document.createElement("div");
-          userDiv.className = "user-card";
-
-          userDiv.innerHTML = `
-            <h2>${user}</h2>
-            <div class="section">
-              <label>Egyenleg módosítása (Ft):</label>
-              <input type="number" id="balanceInput_${user}" value="${balance}" />
-              <button onclick="updateBalance('${user}')">Mentés</button>
-            </div>
-            <div class="section">
-              <label>Kupon hozzáadása:</label>
-              <select id="couponAddSelect_${user}">
-                <option value="" selected disabled>Válassz kupont</option>
-                ${Object.entries(coupons).map(([code, desc]) =>
-                  `<option value="${code}">${desc} (${code})</option>`
-                ).join('')}
-              </select>
-              <button onclick="addCoupon('${user}')">Hozzáadás</button>
-            </div>
-            <div class="section">
-              <label>Aktív kuponok:</label>
-              <ul id="couponList_${user}" style="list-style:none; padding-left:0;">
-                ${Object.keys(userCoupons).map(code => `
-                  <li>
-                    ${coupons[code] || code}
-                    <button class="coupon-btn remove" onclick="removeCoupon('${user}', '${code}')">Eltávolít</button>
-                  </li>
-                `).join('')}
-              </ul>
-            </div>
-          `;
-          container.appendChild(userDiv);
-        });
-      });
-    }
-
-    // Egyenleg módosítása
-    function updateBalance(user) {
-      const input = document.getElementById(`balanceInput_${user}`);
-      const value = parseInt(input.value);
-      if (isNaN(value) || value < 0) {
-        alert("Adj meg érvényes, nem negatív összeget!");
-        return;
-      }
-      db.ref("balances/" + user).set(value)
-        .then(() => alert(`${user} egyenlege frissítve.`))
-        .catch(() => alert("Hiba történt az egyenleg mentésekor."));
-    }
-
-    // Kupon hozzáadása
-    function addCoupon(user) {
-      const select = document.getElementById(`couponAddSelect_${user}`);
-      const code = select.value;
-      if (!code) {
-        alert("Válassz kupont!");
-        return;
-      }
-      db.ref("coupons/" + user + "/" + code).set(true)
-        .then(() => {
-          alert(`${coupons[code]} hozzáadva ${user}-hez.`);
-          loadUsers(); // frissítés
-        })
-        .catch(() => alert("Hiba történt a kupon hozzáadásakor."));
-    }
-
-    // Kupon eltávolítása
-    function removeCoupon(user, code) {
-      if (!confirm(`Biztosan eltávolítod ezt a kupont: ${coupons[code]} - ${user}?`)) return;
-      db.ref("coupons/" + user + "/" + code).remove()
-        .then(() => {
-          alert(`Kupon eltávolítva ${user}-től.`);
-          loadUsers(); // frissítés
-        })
-        .catch(() => alert("Hiba történt a kupon eltávolításakor."));
-    }
-
-    loadUsers();
-  </script>
-  <footer class="site-footer">
-  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
-</footer>
+        loadUsers();
+    </script>
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
 </body>
 </html>

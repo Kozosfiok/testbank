@@ -1,358 +1,518 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ádám bankja</title>
-  <link rel="icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ádám bankja</title>
     <link rel="icon" href="logo.png" type="image/png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #7097E6;
-      text-align: center;
-      padding: 40px;
-    }
-    .card {
-      background: white;
-      display: inline-block;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      max-width: 400px;
-    }
-    input, select {
-      padding: 10px;
-      margin: 10px;
-      width: 80%;
-    }
-    .button {
-      padding: 10px 20px;
-      background-color: #7097E6;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #357ae8;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-    .success {
-      color: green;
-      font-weight: bold;
-    }
-    .logo {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 150px;
-      height: 150px;
-    }
-    .coupon-btn {
-      margin-left: 10px;
-      background-color: #4CAF50;
-      padding: 5px 10px;
-      font-size: 0.9em;
-    }
-    .coupon-btn:hover {
-      background-color: #388E3C;
-    }
-	/* Mobilbarát alap stílusok */
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a82fb;
+            --secondary-color: #fc5c7d;
+            --accent-color: #ffc847;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #1a2238;
+            --header-height: 80px;
+        }
 
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #7097E6;
-  text-align: center;
-}
+        /* === Alapstílusok és Animált Háttér === */
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            margin: 0;
+            padding-top: calc(var(--header-height) + 30px);
+            padding-bottom: 90px;
+            color: var(--text-color);
+            background: linear-gradient(45deg, #6a82fb, #fc5c7d, #ffc847, #54e2d2);
+            background-size: 400% 400%;
+            animation: gradient-flow 20s ease infinite;
+            overflow-x: hidden;
+        }
 
-.card {
-  max-width: 400px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-}
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-input, select, button {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin: 10px 0;
-  padding: 12px;
-  font-size: 1em;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
+        /* === Fejléc és Animált Navigáció === */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
 
-button {
-  background-color: #7097E6;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
+        .logo {
+            height: 55px;
+            width: auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
 
-button:hover {
-  background-color: #357ae8;
-}
+        .menu-toggle {
+            width: 30px;
+            height: 22px;
+            position: relative;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1002;
+        }
+        .menu-toggle span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 3px;
+            left: 0;
+            transition: all 0.35s ease-in-out;
+        }
+        .menu-toggle span:nth-child(1) { top: 0px; }
+        .menu-toggle span:nth-child(2) { top: 9px; }
+        .menu-toggle span:nth-child(3) { top: 18px; }
 
-/* Kis képernyőn nagyobb padding, stb. */
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-  .card {
-    padding: 15px;
-  }
-}
-.epass-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px;
-}
+        .menu-toggle.active span:nth-child(1) { top: 9px; transform: rotate(135deg); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+        .menu-toggle.active span:nth-child(3) { top: 9px; transform: rotate(-135deg); }
 
-.epass-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  width: 280px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: transform 0.3s ease;
-}
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding-top: 120px;
+            text-align: left;
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+        .nav-menu.active {
+            transform: translateX(0);
+        }
+        .nav-menu a {
+            display: block;
+            padding: 20px 35px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .nav-menu.active a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Staggered animation for menu items */
+        .nav-menu.active a:nth-child(1) { transition-delay: 0.1s; }
+        .nav-menu.active a:nth-child(2) { transition-delay: 0.15s; }
+        .nav-menu.active a:nth-child(3) { transition-delay: 0.2s; }
+        .nav-menu.active a:nth-child(4) { transition-delay: 0.25s; }
+        .nav-menu.active a:nth-child(5) { transition-delay: 0.3s; }
 
-.epass-card:hover {
-  transform: scale(1.03);
-}
+        .nav-menu a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateX(10px);
+        }
+        
+        #page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        #page-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
 
-.epass-image {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
+        /* === Fő Tartalom (Kártya) === */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px 45px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+            border: 1px solid var(--glass-border);
+            max-width: 500px;
+            width: 90%;
+            margin: 20px auto;
+            box-sizing: border-box;
+            animation: card-enter 0.8s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
 
-.epass-name {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-.site-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #7097E6;
-  color: white;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 13px;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-.site-footer a {
-  color: white;
-  text-decoration: underline;
-}
+        h1, h2, h3 {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        h1 { font-size: 2.3em; margin-bottom: 10px; }
+        hr { border: none; border-top: 1px solid var(--glass-border); margin: 35px 0;}
 
-.site-footer a:hover {
-  text-decoration: none;
-}
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+        /* === Beviteli Mezők és Gombok === */
+        .input-group {
+            position: relative;
+            margin: 20px 0;
+        }
+        input, select {
+            font-family: 'Poppins', sans-serif;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.75);
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(106, 130, 251, 0.5);
+        }
+
+        .button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            padding: 16px 25px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-size: 200% auto;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:hover {
+            background-position: right center;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* === Kuponok és Üzenetek === */
+        .message { min-height: 24px; font-weight: 600; transition: all 0.3s; }
+        .error { color: #d32f2f; }
+        .success { color: #2e7d32; }
+
+        #activeCouponsList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.35);
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        #activeCouponsList li:hover {
+            transform: scale(1.04);
+            background: rgba(255,255,255,0.55);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .coupon-btn {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .coupon-btn:hover { background-color: #1565c0; }
+
+        /* === E-Pass Kártya === */
+        .epass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+            border-radius: 18px;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .epass-card:hover { 
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        .epass-image { width: 100%; border-radius: 12px; margin-bottom: 15px; }
+
+        /* === Lábléc === */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .site-footer a { color: white; text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        /* === Reszponzivitás === */
+        @media (max-width: 768px) {
+            .card { padding: 25px; }
+            h1 { font-size: 2em; }
+            .header { padding: 0 20px; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
-  <img src="logo.png" alt="Logo" class="logo">
-  <div class="card">
-    <h1>Üdvözlünk, Ádám!</h1>
-    <p>Egyenleged: <strong id="balance">0 Ft</strong></p>
+    <div id="page-overlay" onclick="toggleMenu()"></div>
 
-    <h3>Utalás</h3>
-    <select id="receiver">
-      <option value="" disabled selected>Válassz címzettet</option>
-      <option value="Máté">Máté</option>
-      <option value="Barni">Barni</option>
-      <option value="Dani">Dani</option>
-      <option value="Kamilla">Kamilla</option>
-      <option value="Mama">Mama</option>
-    </select><br />
-    <input type="number" id="amount" placeholder="Összeg Ft-ban" /><br />
-    <button class="button" onclick="transfer()">Utalás</button>
+    <header class="header">
+        <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+    </header>
 
-    <p id="message"></p>
+    <nav class="nav-menu" id="navMenu">
+        <a href="#">Főoldal</a>
+        <a href="#">Tranzakciók</a>
+        <a href="#">Kuponjaim</a>
+        <a href="#">Beállítások</a>
+        <a href="login.html">Kijelentkezés</a>
+    </nav>
 
-    <hr />
+    <main class="card">
+        <h1>Üdvözlünk, Ádám!</h1>
+        <p>Egyenleged: <strong id="balance" style="font-size: 1.3em; color: #0b2257;">0 Ft</strong></p>
 
-    <h3>Kupon beváltása</h3>
-    <input type="text" id="couponCode" placeholder="Írd be a kuponkódot" />
-    <button class="button" onclick="activateCoupon()">Beváltás</button>
-    <p id="couponMessage"></p>
+        <h3>Utalás</h3>
+        <div class="input-group">
+            <select id="receiver">
+                <option value="" disabled selected>Válassz címzettet...</option>
+                <option value="Dani">Dani</option>
+                <option value="Barni">Barni</option>
+                <option value="Máté">Máté</option>
+                <option value="Kamilla">Kamilla</option>
+                <option value="Mama">Mama</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="number" id="amount" placeholder="Összeg Ft-ban" />
+        </div>
+        <button class="button" onclick="transfer()">Utalás indítása</button>
+        <p id="message" class="message"></p>
 
-    <h3>Aktív kuponok:</h3>
-    <ul id="activeCouponsList" style="list-style:none; padding-left:0;"></ul>
+        <hr />
 
-    <br /><br />
+        <h3>Kupon beváltása</h3>
+        <div class="input-group">
+            <input type="text" id="couponCode" placeholder="Írd be a kuponkódot" />
+        </div>
+        <button class="button" onclick="activateCoupon()">Beváltás</button>
+        <p id="couponMessage" class="message"></p>
+        
+        <h3>Aktív kuponok:</h3>
+        <ul id="activeCouponsList" style="list-style:none; padding-left:0;"></ul>
 
-	<hr style="margin: 40px 0; border: none; border-top: 2px solid #d0d0d0;">
+        <hr />
 
-<h2 style="text-align: center; color: #333;">Digitális E-Pass kártya</h2>
+        <h2 style="text-align: center;">Digitális E-Pass</h2>
+        <div style="display: flex; justify-content: center; padding: 20px 0;">
+            <div class="epass-card">
+                <img src="Ádám.png" alt="Ádám E-Pass" class="epass-image" onerror="this.src='https://placehold.co/280x180/6a82fb/ffffff?text=Ádám';">
+                <p class="epass-name">Ádám</p>
+            </div>
+        </div>
+        <button class="button" onclick="location.href='login.html'" style="background: linear-gradient(45deg, #e53935, #f4511e); margin-top:20px;">Kijelentkezés</button>
+    </main>
 
-<div class="epass-container">
-  <div class="epass-card">
-    <img src="Ádám.png" alt="Ádám E-Pass" class="epass-image">
-    <p class="epass-name">Ádám</p>
-  </div>
-    <button class="button" onclick="location.href='login.html'">Kijelentkezés</button>
-  <!-- Add more epass-cards for other users (Barni, Dani, etc.) -->
-</div>
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
 
-  </div>
-
-  <script>
-    const firebaseConfig = {
-
-  apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
-
-  authDomain: "jatekbank-89289.firebaseapp.com",
-
-  databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
-
-  projectId: "jatekbank-89289",
-
-  storageBucket: "jatekbank-89289.firebasestorage.app",
-
-  messagingSenderId: "77741361269",
-
-  appId: "1:77741361269:web:e1226bc616d9e845d9903c",
-
-  measurementId: "G-B76FVR2187"
-
-};
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const currentUser = "Ádám";
-    const users = ["Máté", "Dani", "Barni", "Ádám", "Kamilla", "Mama"];
-    const coupons = {
-      "1000KEKSZ": "-1000 keksz",
-      "FILMV": "Filmválasztás",
-      "JATEK": "Te választod a játékot",
-      "HOLALSZ": "Hol alszol",
-      "KIVELALSZ": "Kivel alszol",
-      "EBED": "Ebédválasztás",
-      "JATSZOTER": "Játszótér"
-    };
-
-    function updateBalanceDisplay() {
-      db.ref("balances/" + currentUser).on("value", snap => {
-        const value = snap.val();
-        document.getElementById("balance").textContent = value.toLocaleString() + " Ft";
-      });
-    }
-
-    function transfer() {
-      const receiver = document.getElementById("receiver").value;
-      const amount = parseInt(document.getElementById("amount").value);
-      const message = document.getElementById("message");
-
-      if (!receiver || isNaN(amount) || amount <= 0 || receiver === currentUser) {
-        message.textContent = "Adj meg érvényes adatokat!";
-        message.className = "error";
-        return;
-      }
-
-      db.ref("balances").once("value").then(snapshot => {
-        const data = snapshot.val();
-        if (data[currentUser] < amount) {
-          message.textContent = "Nincs elég egyenleg!";
-          message.className = "error";
-          return;
+    <script>
+        // === Animált Menü Működése ===
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("active");
+            document.getElementById("menuToggle").classList.toggle("active");
+            document.getElementById("page-overlay").classList.toggle("active");
         }
-        db.ref("balances/" + currentUser).set(data[currentUser] - amount);
-        db.ref("balances/" + receiver).set(data[receiver] + amount);
-        message.textContent = `Sikeres utalás: ${amount} Ft ${receiver} részére.`;
-        message.className = "success";
-        document.getElementById("amount").value = "";
-        document.getElementById("receiver").selectedIndex = 0;
-      });
-    }
+        
+        // Firebase Konfiguráció
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
 
-    function resetBalances() {
-      users.forEach(user => {
-        db.ref("balances/" + user).set(5000);
-      });
-    }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    function activateCoupon() {
-      const code = document.getElementById("couponCode").value.trim().toUpperCase();
-      const msg = document.getElementById("couponMessage");
-      if (!code || !(code in coupons)) {
-        msg.textContent = "Érvénytelen kuponkód!";
-        msg.className = "error";
-        return;
-      }
+        const currentUser = "Ádám";
+        const coupons = {
+            "1000KEKSZ": "-1000 keksz",
+            "FILMV": "Filmválasztás",
+            "JATEK": "Te választod a játékot",
+            "HOLALSZ": "Hol alszol",
+            "KIVELALSZ": "Kivel alszol",
+            "EBED": "Ebédválasztás",
+            "JATSZOTER": "Játszótér"
+        };
 
-      db.ref("coupons/" + currentUser + "/" + code).once("value", snap => {
-        if (snap.exists()) {
-          msg.textContent = "Már aktiváltad ezt a kupont!";
-          msg.className = "error";
-        } else {
-          db.ref("coupons/" + currentUser + "/" + code).set(true);
-          msg.textContent = `Kupon aktiválva: ${coupons[code]}`;
-          msg.className = "success";
-          showActiveCoupons();
+        function updateBalanceDisplay() {
+            db.ref("balances/" + currentUser).on("value", snap => {
+                const value = snap.val() || 0;
+                document.getElementById("balance").textContent = value.toLocaleString('hu-HU') + " Ft";
+            });
         }
-      });
-    }
 
-    function showActiveCoupons() {
-      const listEl = document.getElementById("activeCouponsList");
-      listEl.innerHTML = "";
-      db.ref("coupons/" + currentUser).once("value", snap => {
-        const data = snap.val();
-        if (!data) {
-          listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
-          return;
+        function showMessage(elementId, text, isError) {
+            const el = document.getElementById(elementId);
+            el.textContent = text;
+            el.className = 'message ' + (isError ? 'error' : 'success');
+            setTimeout(() => { el.textContent = ''; }, 4000);
         }
-        for (const code in data) {
-          const li = document.createElement("li");
-          li.textContent = coupons[code] || code;
-          const btn = document.createElement("button");
-          btn.textContent = "Felhasználom";
-          btn.className = "coupon-btn";
-          btn.onclick = () => useCoupon(code);
-          li.appendChild(btn);
-          listEl.appendChild(li);
+
+        function transfer() {
+            const receiver = document.getElementById("receiver").value;
+            const amount = parseInt(document.getElementById("amount").value);
+
+            if (!receiver || isNaN(amount) || amount <= 0 || receiver === currentUser) {
+                showMessage("message", "Adj meg érvényes adatokat!", true);
+                return;
+            }
+
+            db.ref("balances").once("value").then(snapshot => {
+                const data = snapshot.val();
+                if (!data || data[currentUser] < amount) {
+                    showMessage("message", "Nincs elég fedezet az utaláshoz!", true);
+                    return;
+                }
+                db.ref("balances/" + currentUser).set(data[currentUser] - amount);
+                db.ref("balances/" + receiver).set((data[receiver] || 0) + amount);
+                
+                showMessage("message", `Sikeres utalás: ${amount.toLocaleString('hu-HU')} Ft ${receiver} részére.`, false);
+                document.getElementById("amount").value = "";
+                document.getElementById("receiver").selectedIndex = 0;
+            });
         }
-      });
-    }
 
-    function useCoupon(code) {
-      db.ref("coupons/" + currentUser + "/" + code).remove();
-      if (code === "1000KEKSZ") {
-        db.ref("balances/" + currentUser).once("value", snap => {
-          const bal = Math.max(0, snap.val() - 1000);
-          db.ref("balances/" + currentUser).set(bal);
-        });
-      }
-      document.getElementById("couponMessage").textContent = `Felhasználtad: ${coupons[code]}`;
-      document.getElementById("couponMessage").className = "success";
-      showActiveCoupons();
-    }
+        function activateCoupon() {
+            const code = document.getElementById("couponCode").value.trim().toUpperCase();
+            if (!code) {
+                showMessage("couponMessage", "Kérlek, írj be egy kuponkódot!", true);
+                return;
+            }
+            if (!(code in coupons)) {
+                showMessage("couponMessage", "Érvénytelen kuponkód!", true);
+                return;
+            }
 
-    updateBalanceDisplay();
-    showActiveCoupons();
-  </script>
-  <footer class="site-footer">
-  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
-</footer>
+            db.ref("coupons/" + currentUser + "/" + code).once("value", snap => {
+                if (snap.exists()) {
+                    showMessage("couponMessage", "Ezt a kupont már aktiváltad!", true);
+                } else {
+                    db.ref("coupons/" + currentUser + "/" + code).set(true);
+                    showMessage("couponMessage", `Kupon aktiválva: ${coupons[code]}`, false);
+                    document.getElementById("couponCode").value = "";
+                }
+            });
+        }
+
+        function showActiveCoupons() {
+            const listEl = document.getElementById("activeCouponsList");
+            db.ref("coupons/" + currentUser).on("value", snap => {
+                listEl.innerHTML = "";
+                const data = snap.val();
+                if (!data) {
+                    listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
+                    return;
+                }
+                Object.keys(data).forEach(code => {
+                    const li = document.createElement("li");
+                    li.textContent = coupons[code] || code;
+                    const btn = document.createElement("button");
+                    btn.textContent = "Felhasználom";
+                    btn.className = "coupon-btn";
+                    btn.onclick = () => useCoupon(code);
+                    li.appendChild(btn);
+                    listEl.appendChild(li);
+                });
+            });
+        }
+
+        function useCoupon(code) {
+            db.ref("coupons/" + currentUser + "/" + code).remove();
+            if (code === "1000KEKSZ") {
+                db.ref("balances/" + currentUser).once("value", snap => {
+                    const bal = Math.max(0, (snap.val() || 0) - 1000);
+                    db.ref("balances/" + currentUser).set(bal);
+                });
+            }
+            showMessage("couponMessage", `Felhasználtad: ${coupons[code]}`, false);
+        }
+        
+        // Indító függvények
+        updateBalanceDisplay();
+        showActiveCoupons();
+
+    </script>
 </body>
 </html>

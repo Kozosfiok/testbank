@@ -1,329 +1,601 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dolgozói oldal - QR kód beolvasás</title>
-  <link rel="icon" href="icon.png" />
-  <link rel="icon" href="logo.png" type="image/png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #7097E6;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      box-sizing: border-box;
-      color: white;
-    }
-    .logo {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-    }
-    video {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-    #output {
-      margin-top: 15px;
-      font-size: 1.2em;
-      font-weight: bold;
-      min-height: 1.5em;
-    }
-    #inputForm {
-      background: white;
-      color: black;
-      max-width: 400px;
-      margin: 30px auto 0;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      display: none;
-      text-align: left;
-    }
-    #inputForm input, #inputForm select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-    #inputForm button {
-      padding: 10px 20px;
-      background-color: #7097E6;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-    #inputForm button:hover {
-      background-color: #357ae8;
-    }
-    #message {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    .error {
-      color: #ff4444;
-    }
-    .success {
-      color: #4CAF50;
-    }
-    .logout-box {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-      z-index: 1000;
-    }
-    .logout-box button {
-      background-color: transparent;
-      border: none;
-      color: #333;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .logout-box button:hover {
-      text-decoration: underline;
-    }
-    .site-footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #7097E6;
-      color: white;
-      text-align: center;
-      padding: 6px 0;
-      font-size: 13px;
-      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-    }
-    .site-footer a {
-      color: white;
-      text-decoration: underline;
-    }
-    .site-footer a:hover {
-      text-decoration: none;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dolgozói oldal - QR kód beolvasás</title>
+    <link rel="icon" href="icon.png" />
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Blue color scheme for this page (similar to main login) */
+            --primary-blue: #4A90E2;
+            --primary-blue-hover: #357ABD;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --text-color-light: #fff;
+            --text-color-dark: #333;
+            --error-color: #FFDDDD;
+            --success-color: #D4EDDA; /* Light green for success background */
+            --success-text-color: #28a745; /* Darker green for success text */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FF6F61, #FFD000, #34B96F, #4A90E2, #8A2BE2); /* Rainbow background */
+            background-size: 400% 400%;
+            animation: rainbowBackground 15s ease infinite;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+            color: var(--text-color-light);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes rainbowBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
+
+        .logo {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            z-index: 2;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .logout-box {
+            position: fixed; /* Use fixed for consistency with logo */
+            top: 30px;
+            left: 30px;
+            padding: 0; /* Padding moved to button */
+            z-index: 2;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .logout-box button {
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: var(--text-color-light);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            outline: none; /* No outline */
+        }
+
+        .logout-box button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--text-color-light);
+            transform: translateY(-2px);
+        }
+        .logout-box button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5); /* Custom focus */
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            margin-top: 80px; /* Space for fixed logout/logo */
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px; /* Softer corners */
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Enhanced shadow */
+            background-color: rgba(0,0,0,0.1); /* Placeholder background */
+            border: 1px solid rgba(255,255,255,0.2); /* Subtle border */
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            min-height: 1.5em;
+            color: var(--text-color-light);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #inputForm {
+            max-width: 450px; /* Slightly wider form */
+            margin: 30px auto;
+            padding: 30px; /* More padding */
+            display: none;
+            text-align: left;
+            color: var(--text-color-dark); /* Dark text for form content */
+            animation: fadeIn 0.8s ease-out; /* Fade in animation for the form itself */
+        }
+
+        #inputForm h2 {
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-blue); /* Blue for form title */
+            text-align: center;
+        }
+
+        #inputForm label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 1.05em;
+            color: var(--text-color-dark);
+        }
+
+        #inputForm input[type="number"],
+        #inputForm select {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 1em;
+            box-sizing: border-box;
+            border: 1px solid #ddd; /* Lighter border */
+            border-radius: 8px;
+            background-color: #f8f8f8; /* Slightly off-white background */
+            transition: all 0.3s ease;
+            color: var(--text-color-dark);
+            -webkit-appearance: none; /* Remove default select arrow on WebKit */
+            -moz-appearance: none; /* Remove default select arrow on Firefox */
+            appearance: none; /* Remove default select arrow */
+        }
+
+        #inputForm input[type="number"]:focus,
+        #inputForm select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Blue focus ring */
+            background-color: #fff;
+        }
+
+        /* Custom arrow for select */
+        #inputForm .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        #inputForm .select-wrapper::after {
+            content: '▼'; /* Unicode down arrow */
+            font-size: 0.8em;
+            color: #888;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            position: absolute;
+            pointer-events: none; /* Ensures clicks go through to the select */
+        }
+
+
+        #inputForm input[type="radio"] {
+            margin-right: 5px;
+            vertical-align: middle;
+            width: auto; /* Allow radio buttons to be natural width */
+            padding: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        #inputForm input[type="radio"] + label {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: 400;
+            color: var(--text-color-dark);
+            cursor: pointer;
+        }
+
+        #inputForm button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-top: 25px; /* More space above buttons */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        #inputForm button:hover {
+            background-color: var(--primary-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        #inputForm button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5); /* Custom focus */
+        }
+
+        #message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .error {
+            color: #D8000C; /* Darker red text */
+            background-color: #FFD2D2; /* Light red background */
+        }
+
+        .success {
+            color: var(--success-text-color);
+            background-color: var(--success-color);
+        }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-color-light);
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            z-index: 10;
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
+            margin-top: auto; /* Pushes footer to bottom if content is short */
+        }
+
+        .site-footer p {
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .site-footer a {
+            color: #9ECFFF;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: var(--text-color-light);
+            text-decoration: underline;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+                margin-top: 70px;
+            }
+            .logo {
+                width: 90px;
+                top: 20px;
+                right: 20px;
+            }
+            .logout-box {
+                top: 20px;
+                left: 20px;
+            }
+            .logout-box button {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            #inputForm {
+                padding: 25px;
+                max-width: 90%;
+            }
+            #inputForm h2 {
+                font-size: 1.5em;
+            }
+            #inputForm input, #inputForm select, #inputForm button {
+                font-size: 0.95em;
+                padding: 10px;
+            }
+            .site-footer {
+                padding: 10px 0;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+                margin-top: 60px;
+            }
+            .logo {
+                width: 70px;
+                top: 15px;
+                right: 15px;
+            }
+            .logout-box {
+                top: 15px;
+                left: 15px;
+            }
+            .logout-box button {
+                font-size: 12px;
+                padding: 7px 10px;
+            }
+            #inputForm {
+                padding: 20px;
+                max-width: 95%;
+            }
+            #inputForm h2 {
+                font-size: 1.3em;
+            }
+            #inputForm input, #inputForm select, #inputForm button {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .site-footer {
+                padding: 8px 0;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <img src="logo.png" alt="Logo" class="logo" />
-  <div class="logout-box">
-    <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
-  </div>
-  <h1>QR kód beolvasás - Dolgozói oldal</h1>
-  <video id="video" muted playsinline></video>
-  <div id="output">QR kód beolvasása...</div>
+    <img src="logo.png" alt="Logo" class="logo" />
+    <div class="logout-box glass-effect">
+        <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
+    </div>
 
-  <div id="inputForm">
-    <h2 id="userTitle"></h2>
+    <h1>QR kód beolvasás - Dolgozói oldal</h1>
+    <video id="video" muted playsinline></video>
+    <div id="output">QR kód beolvasása...</div>
 
-    <label for="amount">Keksz (kézpénz) összege (Ft):</label>
-    <input type="number" id="amount" placeholder="Pl. 5000" min="0" />
+    <div id="inputForm" class="glass-effect">
+        <h2 id="userTitle"></h2>
 
-    <label>Művelet:</label><br />
-    <input type="radio" name="operation" id="add" value="add" checked />
-    <label for="add">Hozzáadás</label>
-    <input type="radio" name="operation" id="subtract" value="subtract" />
-    <label for="subtract">Levonás</label>
+        <label for="amount">Keksz (kézpénz) összege (Ft):</label>
+        <input type="number" id="amount" placeholder="Pl. 5000" min="0" />
 
-    <label for="couponSelect">Kupon hozzáadása:</label>
-    <select id="couponSelect">
-      <option value="">-- Válassz kupont --</option>
-      <option value="1000KEKSZ">-1000 keksz</option>
-      <option value="FILMV">Filmválasztás</option>
-      <option value="JATEK">Te választod a játékot</option>
-      <option value="HOLALSZ">Hol alszol</option>
-      <option value="KIVELALSZ">Kivel alszol</option>
-      <option value="EBED">Ebédválasztás</option>
-      <option value="JATSZOTER">Játszótér</option>
-    </select>
+        <label>Művelet:</label><br />
+        <input type="radio" name="operation" id="add" value="add" checked />
+        <label for="add">Hozzáadás</label>
+        <input type="radio" name="operation" id="subtract" value="subtract" />
+        <label for="subtract">Levonás</label>
 
-    <button onclick="submitCash()">Beküldés</button>
-    <div id="message"></div>
-    <button onclick="resetForm()" style="margin-top:10px;">Új beolvasás</button>
-  </div>
+        <label for="couponSelect">Kupon hozzáadása:</label>
+        <div class="select-wrapper">
+            <select id="couponSelect">
+                <option value="">-- Válassz kupont --</option>
+                <option value="1000KEKSZ">-1000 keksz</option>
+                <option value="FILMV">Filmválasztás</option>
+                <option value="JATEK">Te választod a játékot</option>
+                <option value="HOLALSZ">Hol alszol</option>
+                <option value="KIVELALSZ">Kivel alszol</option>
+                <option value="EBED">Ebédválasztás</option>
+                <option value="JATSZOTER">Játszótér</option>
+            </select>
+        </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+        <button onclick="submitCash()">Beküldés</button>
+        <div id="message"></div>
+        <button onclick="resetForm()" style="margin-top:10px;">Új beolvasás</button>
+    </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
-      authDomain: "jatekbank-89289.firebaseapp.com",
-      databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
-      projectId: "jatekbank-89289",
-      storageBucket: "jatekbank-89289.firebasestorage.app",
-      messagingSenderId: "77741361269",
-      appId: "1:77741361269:web:e1226bc616d9e845d9903c",
-      measurementId: "G-B76FVR2187"
-    };
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
 
-    const video = document.getElementById("video");
-    const output = document.getElementById("output");
-    const inputForm = document.getElementById("inputForm");
-    const userTitle = document.getElementById("userTitle");
-    const amountInput = document.getElementById("amount");
-    const couponSelect = document.getElementById("couponSelect");
-    const messageDiv = document.getElementById("message");
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    let scanning = false;
-    let scannedUser = null;
+        const video = document.getElementById("video");
+        const output = document.getElementById("output");
+        const inputForm = document.getElementById("inputForm");
+        const userTitle = document.getElementById("userTitle");
+        const amountInput = document.getElementById("amount");
+        const couponSelect = document.getElementById("couponSelect");
+        const messageDiv = document.getElementById("message");
 
-    function startCamera() {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
-          video.srcObject = stream;
-          video.setAttribute("playsinline", true);
-          video.play();
+        let scanning = false;
+        let scannedUser = null;
 
-          video.onloadedmetadata = () => {
-            scanning = true;
-            scanFrame();
-          };
-        })
-        .catch(err => {
-          output.textContent = "Nem sikerült elindítani a kamerát: " + err;
-        });
-    }
+        function startCamera() {
+            // Check if there are any video tracks active before attempting to stop
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
 
-    function scanFrame() {
-      if (!scanning) return;
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    video.play();
 
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        if (canvas.width === 0 || canvas.height === 0) {
-          requestAnimationFrame(scanFrame);
-          return;
+                    video.onloadedmetadata = () => {
+                        scanning = true;
+                        scanFrame();
+                    };
+                })
+                .catch(err => {
+                    output.textContent = "Nem sikerült elindítani a kamerát: " + err.message;
+                    console.error("Camera access error: ", err);
+                });
         }
 
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        function scanFrame() {
+            if (!scanning) return;
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, canvas.width, canvas.height, {
-          inversionAttempts: "dontInvert",
-        });
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
 
-        if (code) {
-          const candidateUser = code.data.trim();
-          db.ref("balances/" + candidateUser).get().then(snapshot => {
-            if (snapshot.exists()) {
-              scannedUser = candidateUser;
-              output.textContent = `Beolvasott név: ${scannedUser}`;
-              scanning = false;
-              video.srcObject.getTracks().forEach(track => track.stop());
-              showInputForm(scannedUser);
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                if (canvas.width === 0 || canvas.height === 0) {
+                    requestAnimationFrame(scanFrame);
+                    return;
+                }
+
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, canvas.width, canvas.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    const candidateUser = code.data.trim();
+                    db.ref("balances/" + candidateUser).get().then(snapshot => {
+                        if (snapshot.exists()) {
+                            scannedUser = candidateUser;
+                            output.textContent = `Beolvasott név: ${scannedUser}`;
+                            scanning = false;
+                            video.srcObject.getTracks().forEach(track => track.stop()); // Stop camera
+                            showInputForm(scannedUser);
+                        } else {
+                            output.textContent = `Nincs ilyen fiók: ${candidateUser}`;
+                            setTimeout(() => {
+                                output.textContent = "QR kód beolvasása...";
+                                if (scanning) { // Only continue scanning if still in scanning mode
+                                    requestAnimationFrame(scanFrame);
+                                }
+                            }, 3000);
+                        }
+                    }).catch(err => {
+                        output.textContent = "Hiba történt a fiók ellenőrzésekor: " + err.message;
+                        console.error("Firebase fetch error: ", err);
+                    });
+                } else {
+                    requestAnimationFrame(scanFrame);
+                }
             } else {
-              output.textContent = `Nincs ilyen fiók: ${candidateUser}`;
-              setTimeout(() => {
-                output.textContent = "QR kód beolvasása...";
-                scanFrame();
-              }, 3000);
+                requestAnimationFrame(scanFrame);
             }
-          }).catch(err => {
-            output.textContent = "Hiba történt a fiók ellenőrzésekor: " + err;
-          });
-        } else {
-          requestAnimationFrame(scanFrame);
         }
-      } else {
-        requestAnimationFrame(scanFrame);
-      }
-    }
 
-    function showInputForm(user) {
-      userTitle.textContent = `${user} fiókja`;
-      inputForm.style.display = "block";
-      amountInput.value = "";
-      couponSelect.value = "";
-      messageDiv.textContent = "";
-      messageDiv.className = "";
-    }
+        function showInputForm(user) {
+            userTitle.textContent = `${user} fiókja`;
+            inputForm.style.display = "block";
+            amountInput.value = "";
+            couponSelect.value = "";
+            messageDiv.textContent = "";
+            messageDiv.className = "";
+        }
 
-    function submitCash() {
-      const amount = parseInt(amountInput.value);
-      const coupon = couponSelect.value;
-      const operation = document.querySelector('input[name="operation"]:checked').value;
+        function submitCash() {
+            const amount = parseInt(amountInput.value);
+            const coupon = couponSelect.value;
+            const operation = document.querySelector('input[name="operation"]:checked').value;
 
-      if ((isNaN(amount) || amount < 0) && coupon === "") {
-        messageDiv.textContent = "Adj meg összeget vagy válassz kupont!";
-        messageDiv.className = "error";
-        return;
-      }
-
-      const updates = {};
-
-      db.ref("balances/" + scannedUser).once("value").then(snapshot => {
-        let currentBalance = snapshot.val() || 0;
-
-        if (!isNaN(amount) && amount > 0) {
-          let newBalance = currentBalance;
-
-          if (operation === "add") {
-            newBalance += amount;
-          } else if (operation === "subtract") {
-            if (currentBalance < amount) {
-              throw new Error("Nincs elég keksz az egyenlegen.");
+            if ((isNaN(amount) || amount <= 0) && coupon === "") { /* Changed amount >= 0 to amount <= 0 */
+                messageDiv.textContent = "Adj meg pozitív összeget vagy válassz kupont!";
+                messageDiv.className = "error";
+                return;
             }
-            newBalance -= amount;
-          }
 
-          updates["balances/" + scannedUser] = newBalance;
+            const updates = {};
+
+            db.ref("balances/" + scannedUser).once("value").then(snapshot => {
+                let currentBalance = snapshot.val() || 0;
+
+                if (!isNaN(amount) && amount > 0) {
+                    let newBalance = currentBalance;
+
+                    if (operation === "add") {
+                        newBalance += amount;
+                    } else if (operation === "subtract") {
+                        if (currentBalance < amount) {
+                            throw new Error("Nincs elég keksz az egyenlegen.");
+                        }
+                        newBalance -= amount;
+                    }
+                    updates["balances/" + scannedUser] = newBalance;
+                }
+
+                if (coupon !== "") {
+                    // Check if coupon already exists for the user
+                    return db.ref("coupons/" + scannedUser + "/" + coupon).once("value").then(couponSnapshot => {
+                        if (couponSnapshot.exists() && couponSnapshot.val() === true) {
+                            throw new Error("Ez a kupon már hozzá van rendelve ehhez a felhasználóhoz.");
+                        }
+                        updates["coupons/" + scannedUser + "/" + coupon] = true;
+                        return db.ref().update(updates);
+                    });
+                }
+                return db.ref().update(updates); // If only amount is updated
+            }).then(() => {
+                messageDiv.textContent = "Sikeres mentés!";
+                messageDiv.className = "success";
+                setTimeout(() => {
+                    resetForm();
+                }, 2000);
+            }).catch(err => {
+                messageDiv.textContent = "Hiba: " + err.message;
+                messageDiv.className = "error";
+            });
         }
 
-        if (coupon !== "") {
-          updates["coupons/" + scannedUser + "/" + coupon] = true;
+        function resetForm() {
+            inputForm.style.display = "none";
+            output.textContent = "QR kód beolvasása...";
+            scannedUser = null;
+            // Clear input values
+            amountInput.value = "";
+            couponSelect.value = "";
+            document.getElementById('add').checked = true; // Reset radio button
+            messageDiv.textContent = "";
+            messageDiv.className = "";
+
+            startCamera(); // Restart camera only after everything is reset
         }
 
-        return db.ref().update(updates);
-      }).then(() => {
-        messageDiv.textContent = "Sikeres mentés!";
-        messageDiv.className = "success";
-        setTimeout(() => {
-          resetForm();
-        }, 2000);
-      }).catch(err => {
-        messageDiv.textContent = "Hiba: " + err.message;
-        messageDiv.className = "error";
-      });
-    }
+        window.onload = () => {
+            startCamera();
+        };
+    </script>
 
-    function resetForm() {
-      inputForm.style.display = "none";
-      output.textContent = "QR kód beolvasása...";
-      scannedUser = null;
-      startCamera();
-    }
-
-    window.onload = () => {
-      startCamera();
-    };
-  </script>
-
-  <footer class="site-footer">
-    <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
-  </footer>
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
 </body>
 </html>

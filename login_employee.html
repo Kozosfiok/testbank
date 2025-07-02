@@ -1,174 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bank Of MAMA Dolgozói Bejelentkezés</title>
-  <link rel="icon" href="logo.png" type="image/png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #a5ef8b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Of MAMA Dolgozói Bejelentkezés</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Green color scheme variables */
+            --primary-green: #4CAF50; /* A nice, vibrant green */
+            --primary-green-hover: #45a049; /* Slightly darker on hover */
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --text-color-light: #fff;
+            --text-color-dark: #333;
+        }
 
-    .login-box {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      text-align: center;
-      width: 300px;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Green gradient background */
+            background: linear-gradient(135deg, #a5ef8b, #7ed957, #4CAF50, #2E8B57);
+            background-size: 400% 400%;
+            animation: greenBackground 15s ease infinite; /* New animation for green */
+            overflow: hidden;
+            position: relative;
+        }
 
-    .login-box h2 {
-      margin-bottom: 20px;
-    }
+        @keyframes greenBackground { /* Green specific background animation */
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    .login-box input {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
 
-    .login-box button {
-      padding: 10px 20px;
-      background-color: #a5ef8b;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+        .login-box {
+            padding: 40px;
+            text-align: center;
+            width: 350px;
+            max-width: 90%;
+            z-index: 1;
+            animation: fadeIn 1s ease-out;
+        }
 
-    .login-box button:hover {
-      background-color: #c4f98b;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .error {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
-    }
+        .login-box h2 {
+            margin-bottom: 30px;
+            color: var(--text-color-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 2em;
+            text-decoration: none; /* No underline */
+        }
 
-    /* Logo Styling */
-    .logo {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 150px; /* Increased size */
-      height: 150px; /* Increased size */
-    }
-	 .fade-out {
-    opacity: 0;
-    transition: opacity 1s ease;
-  }
+        .login-box input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color-light);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
 
-  body.fade-bg {
-    background-color: #a5ef8b !important;
-    transition: background-color 1s ease;
-  }
-  .employee-login-box {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
-}
+        .login-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
 
-.employee-login-box button {
-  background-color: transparent;
-  border: none;
-  color: #333;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-}
+        .login-box input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 2px var(--primary-green); /* Green focus outline */
+        }
 
-.employee-login-box button:hover {
-  text-decoration: underline;
-}
-.site-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #a5ef8b;
-  color: black;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 13px;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
+        .login-box button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--primary-green); /* Green button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            outline: none;
+        }
 
-.site-footer a {
-  color: black;
-  text-decoration: underline;
-}
+        .login-box button:hover {
+            background-color: var(--primary-green-hover); /* Darker green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
 
-.site-footer a:hover {
-  text-decoration: none;
-}
-  </style>
+        .login-box button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.5); /* Custom green focus indication */
+        }
+
+        .error {
+            color: #FFDDDD;
+            background-color: rgba(255, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 14px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        /* Logo Styling */
+        .logo {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+            z-index: 2;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        /* Employee Login Box (now "Sima belépés") */
+        .other-login-box { /* Renamed for clarity on this page */
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            padding: 0;
+            z-index: 2;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .other-login-box button {
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: var(--text-color-light);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .other-login-box button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--text-color-light);
+            transform: translateY(-2px);
+        }
+
+        .other-login-box button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- Footer Styles --- */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-color-light);
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            z-index: 10;
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .site-footer p {
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .site-footer a {
+            color: #C0FFC0; /* Lighter green/cyan for links */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: var(--text-color-light);
+            text-decoration: underline;
+        }
+
+        /* Fade out for redirection */
+        .fade-out {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        body.fade-bg {
+            background: linear-gradient(135deg, #a5ef8b, #a5ef8b) !important; /* Solid color for fade */
+            background-size: 100% 100% !important;
+            animation: none !important;
+            transition: background 1s ease;
+        }
+
+        /* --- Media Queries for Mobile Responsiveness --- */
+
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 30px;
+                width: 90%;
+            }
+
+            .login-box h2 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+
+            .login-box input {
+                padding: 10px;
+                font-size: 15px;
+                margin: 10px 0;
+            }
+
+            .login-box button {
+                padding: 10px 15px;
+                font-size: 16px;
+                margin-top: 15px;
+            }
+
+            .logo {
+                width: 90px;
+                top: 20px;
+                right: 20px;
+            }
+
+            .other-login-box { /* Renamed for clarity */
+                top: 20px;
+                left: 20px;
+            }
+
+            .other-login-box button {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .site-footer {
+                padding: 10px 0;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 25px;
+                width: 95%;
+            }
+
+            .login-box h2 {
+                font-size: 1.4em;
+                margin-bottom: 15px;
+            }
+
+            .logo {
+                width: 70px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .other-login-box { /* Renamed for clarity */
+                top: 15px;
+                left: 15px;
+            }
+
+            .other-login-box button {
+                font-size: 12px;
+                padding: 7px 10px;
+            }
+
+            .site-footer {
+                padding: 8px 0;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Logo at the top-right corner -->
-  <img src="logo.png" alt="Logo" class="logo">
-	<div class="employee-login-box">
-	  <button onclick="window.location.href='login.html'">Sima belépés</button>
-	</div>
-  <div class="login-box">
-    <h2>Dolgozói Bejelentkezés</h2>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Felhasználónév" required><br>
-      <input type="password" id="password" placeholder="Jelszó" required><br>
-      <button type="submit">Bejelentkezés</button>
-      <div class="error" id="error-msg"></div>
-    </form>
-  </div>
+    <img src="logo.png" alt="Logo" class="logo">
 
-  <script>
-  const accounts = [
-    { username: 'Munkás', password: '12345678', page: 'dolgozoi.html' },
-    { username: 'admin', password: 'admin1234', page: 'admin.html' },
-  ];
+    <div class="other-login-box glass-effect">
+        <button onclick="window.location.href='login.html'">Sima belépés</button>
+    </div>
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+    <div class="login-box glass-effect">
+        <h2>Dolgozói Bejelentkezés</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Felhasználónév" required autocomplete="username"><br>
+            <input type="password" id="password" placeholder="Jelszó" required autocomplete="current-password"><br>
+            <button type="submit">Bejelentkezés</button>
+            <div class="error" id="error-msg"></div>
+        </form>
+    </div>
 
-    const inputUser = document.getElementById('username').value.trim();
-    const inputPass = document.getElementById('password').value.trim();
-    const errorMsg = document.getElementById('error-msg');
-    const loginBox = document.querySelector('.login-box');
+    <script>
+        const accounts = [
+            { username: 'Munkás', password: '12345678', page: 'dolgozoi.html' },
+            { username: 'admin', password: 'admin1234', page: 'admin.html' },
+        ];
 
-    errorMsg.textContent = '';
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-    const match = accounts.find(acc => acc.username === inputUser && acc.password === inputPass);
+            const inputUser = document.getElementById('username').value.trim();
+            const inputPass = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            const loginBox = document.querySelector('.login-box');
+            const body = document.body;
 
-    if (match) {
-      // Indítsuk az animációt
-      loginBox.classList.add('fade-out');
-      document.body.classList.add('fade-bg');
+            errorMsg.textContent = '';
+            errorMsg.classList.remove('error');
 
-      // Várjunk az animáció végéig (1s), majd irányítsunk át
-      setTimeout(() => {
-        window.location.href = match.page;
-      }, 1000);
-    } else {
-      errorMsg.textContent = 'Hibás felhasználónév vagy jelszó.';
-    }
-  });
-</script>
-<footer class="site-footer">
-  <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
-</footer>
+            const match = accounts.find(acc => acc.username === inputUser && acc.password === inputPass);
+
+            if (match) {
+                loginBox.classList.add('fade-out');
+                body.classList.add('fade-bg');
+
+                setTimeout(() => {
+                    window.location.href = match.page;
+                }, 1000);
+            } else {
+                errorMsg.textContent = 'Hibás felhasználónév vagy jelszó.';
+                errorMsg.classList.add('error');
+            }
+        });
+    </script>
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
 </body>
 </html>

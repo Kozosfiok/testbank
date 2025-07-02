@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bank Of MAMA - Rólunk</title>
+    <link rel="icon" href="icon.png" />
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Consistent color scheme variables */
+            --primary-accent: #FF6F61; /* A warm orange-red for accents */
+            --primary-accent-hover: #e55a4e;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --text-color-light: #fff;
+            --text-color-dark: #333;
+            --about-card-bg: rgba(255, 255, 255, 0.08); /* Slightly transparent white for sections */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FFD000, #34B96F, #4A90E2, #FF6F61, #8A2BE2); /* A vibrant, mixed gradient */
+            background-size: 400% 400%;
+            animation: rainbowBackground 15s ease infinite;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 70px; /* Space for fixed footer */
+        }
+
+        @keyframes rainbowBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
+
+        .logo {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            z-index: 2;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .back-box { /* Adjusted for general "back" button */
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 0;
+            z-index: 2;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .back-box button {
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: var(--text-color-light);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .back-box button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--text-color-light);
+            transform: translateY(-2px);
+        }
+        .back-box button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            color: var(--text-color-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 2.5em;
+            margin-top: 100px; /* Space for fixed elements */
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-container {
+            width: 90%;
+            max-width: 800px; /* Max width for readability */
+            margin: 20px auto;
+            padding: 30px;
+            color: var(--text-color-dark);
+            text-align: left;
+            animation: fadeIn 0.8s ease-out;
+            box-sizing: border-box;
+            line-height: 1.6; /* Better readability */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .about-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed rgba(0,0,0,0.15);
+        }
+        .about-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .about-section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-accent);
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        .about-section p {
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .about-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .about-section ul li {
+            background-color: var(--about-card-bg);
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            position: relative;
+            font-size: 1em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .about-section ul li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .about-section ul li::before {
+            content: '✨'; /* Sparkle emoji for a playful touch */
+            font-size: 1.2em;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-right: 10px;
+        }
+
+        .about-section ul li span.list-item-text {
+            padding-left: 30px; /* Space for the custom emoji */
+            display: block;
+        }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-color-light);
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            z-index: 10;
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .site-footer p {
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .site-footer a {
+            color: #C0E0FF;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: var(--text-color-light);
+            text-decoration: underline;
+        }
+
+        /* --- Media Queries for Responsiveness --- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                margin-top: 80px;
+                margin-bottom: 30px;
+            }
+            .logo {
+                width: 90px;
+                top: 20px;
+                right: 20px;
+            }
+            .back-box {
+                top: 20px;
+                left: 20px;
+            }
+            .back-box button {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .about-container {
+                padding: 25px;
+                width: 95%;
+            }
+            .about-section h2 {
+                font-size: 1.6em;
+            }
+            .about-section p {
+                font-size: 0.95em;
+            }
+            .about-section ul li {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            .about-section ul li::before {
+                left: 8px;
+            }
+            .about-section ul li span.list-item-text {
+                padding-left: 25px;
+            }
+            .site-footer {
+                padding: 10px 0;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+                margin-top: 70px;
+                margin-bottom: 25px;
+            }
+            .logo {
+                width: 70px;
+                top: 15px;
+                right: 15px;
+            }
+            .back-box {
+                top: 15px;
+                left: 15px;
+            }
+            .back-box button {
+                font-size: 12px;
+                padding: 7px 10px;
+            }
+            .about-container {
+                padding: 20px;
+                width: 100%;
+            }
+            .about-section h2 {
+                font-size: 1.4em;
+            }
+            .about-section p {
+                font-size: 0.9em;
+            }
+            .about-section ul li {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+            .about-section ul li::before {
+                left: 6px;
+            }
+            .about-section ul li span.list-item-text {
+                padding-left: 20px;
+            }
+            .site-footer {
+                padding: 8px 0;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="logo.png" alt="Logo" class="logo" />
+    <div class="back-box glass-effect">
+        <button onclick="window.history.back()">Vissza</button>
+    </div>
+
+    <h1>Rólunk</h1>
+
+    <div class="about-container glass-effect">
+        <div class="about-section">
+            <h2>Mi ez a "Bank Of MAMA"?</h2>
+            <p>Üdvözlünk a Bank Of MAMA "pénzintézetben", egy olyan digitális kísérletben, amelyet elsősorban szórakozásból, egy belső poénként hoztunk létre. Ez a projekt nem egy hagyományos, banki minőségű alkalmazás – sőt, valójában semmi köze a valódi bankoláshoz!</p>
+            <p>Alapvetően egy vicces rendszer, ahol a "keksz" nevű virtuális fizetőeszközt gyűjtheted és költheted el különböző, mókás kuponokra, amiket a "rendszergazdák" (aka. a projekt kitalálói) biztosítanak.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>Ami a kapucni alatt van (és ami nincs)</h2>
+            <p>Ezt a "bankot" egy programozó építette, akinek az a legfőbb célja, hogy (a lehető legkevesebb erőfeszítéssel) valami vicceset és funkcionálisat hozzon létre. Fontos tudnod:</p>
+            <ul>
+                <li><span class="list-item-text">**Biztonság? Mi az?** Ez a projekt alapvetően <strong>nem biztonságos</strong>. Ne tárolj rajta semmilyen érzékeny adatot (bár nem is tudnál, hacsak nem a kedvenc pizzád a jelszavad).</span></li>
+                <li><span class="list-item-text">**Bugok? Persze!** Tele vagyunk velük. Olyan, mint egy digitális sajttorta – lyukacsos és néha furcsa, de szeretjük. Ha találsz egyet, üdv a klubban!</span></li>
+                <li><span class="list-item-text">**Kódoló vs. AI:** A projekt alapjait (azt, ami még valamennyire értelmesnek tűnik) én programoztam, a többi részt, főleg a szebb kinézetet és az apróbb részleteket pedig a Google mesterséges intelligenciája segített összehozni. Szóval, ha valami szép és profi, az az AI érdeme, ha pedig hibás vagy furcsa, az valószínűleg az én lelkemen szárad. 😉</span></li>
+                <li><span class="list-item-text">**Adatbázis a felhőben:** Az egyenlegek és kuponok a Firebase Realtime Database-ben tárolódnak. Így a "keksz" egyenleged bárhonnan elérhető – már ha be tudsz jelentkezni, és nem omlik össze épp valami.</span></li>
+            </ul>
+        </div>
+
+        <div class="about-section">
+            <h2>Küldetésünk (és a valóság)</h2>
+            <p>Küldetésünk a szórakoztatás és az "oktatás" (értsd: vicces kudarcokból való tanulás). Reméljük, hogy ez a kis "bank" mosolyt csal az arcodra, és ha valaha is programozó leszel, megtanulod belőle, hogyan NE írj kódot – de élvezd a folyamatot!</p>
+            <p>Köszi, hogy velünk tartasz ebben a furcsa, digitális utazásban!</p>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
+</body>
+</html>
