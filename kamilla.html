@@ -135,8 +135,6 @@
         .nav-menu.active a:nth-child(1) { transition-delay: 0.1s; }
         .nav-menu.active a:nth-child(2) { transition-delay: 0.15s; }
         .nav-menu.active a:nth-child(3) { transition-delay: 0.2s; }
-        .nav-menu.active a:nth-child(4) { transition-delay: 0.25s; }
-        .nav-menu.active a:nth-child(5) { transition-delay: 0.3s; }
 
         .nav-menu a:hover {
             background-color: var(--primary-color);
@@ -326,10 +324,8 @@
     </header>
 
     <nav class="nav-menu" id="navMenu">
-        <a href="#">Főoldal</a>
-        <a href="#">Tranzakciók</a>
-        <a href="#">Kuponjaim</a>
-        <a href="#">Beállítások</a>
+        <a href="transactions.html">Tranzakciók</a> 
+		<a href="about.html">Rólunk</a>
         <a href="login.html">Kijelentkezés</a>
     </nav>
 
@@ -375,7 +371,6 @@
                 <p class="epass-name">Kamilla</p>
             </div>
         </div>
-        <button class="button" onclick="location.href='login.html'" style="background: linear-gradient(45deg, #e53935, #f4511e); margin-top:20px;">Kijelentkezés</button>
     </main>
 
     <footer class="site-footer">
@@ -391,6 +386,7 @@
         }
         
         // Firebase Konfiguráció
+        // A te Firebase adataidat használom, amiket megadtál!
         const firebaseConfig = {
             apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
             authDomain: "jatekbank-89289.firebaseapp.com",
@@ -405,7 +401,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const currentUser = "Kamilla";
+        const currentUser = "Kamilla"; // Ez az oldal Kamillahoz tartozik
+
+        // Kuponok definíciója
         const coupons = {
             "1000KEKSZ": "-1000 keksz",
             "FILMV": "Filmválasztás",
@@ -416,7 +414,32 @@
             "JATSZOTER": "Játszótér"
         };
 
+        // --- Tranzakció Rögzítése Függvény ---
+        function recordTransaction(sender, receiver, amount, description) {
+            const transactionsRef = db.ref('transactions');
+            const newTransactionRef = transactionsRef.push(); // Egyedi kulcs generálása
+
+            newTransactionRef.set({
+                timestamp: new Date().toISOString(), // ISO formátum a könnyebb rendezéshez
+                sender: sender,
+                receiver: receiver,
+                amount: amount,
+                description: description
+            })
+            .then(() => {
+                console.log("Tranzakció sikeresen rögzítve.");
+            })
+            .catch((error) => {
+                console.error("Hiba a tranzakció rögzítésekor: ", error);
+                // Nem feltétlenül szükséges alert itt, elég a konzolra írás,
+                // mivel a fő művelet (utalás/kupon) már visszajelzést ad.
+            });
+        }
+        // --- Tranzakció Rögzítése Függvény VÉGE ---
+
+
         function updateBalanceDisplay() {
+            // Itt figyeled a 'balances' adatbázis 'Kamilla' alatti változásait
             db.ref("balances/" + currentUser).on("value", snap => {
                 const value = snap.val() || 0;
                 document.getElementById("balance").textContent = value.toLocaleString('hu-HU') + " Ft";
@@ -439,18 +462,42 @@
                 return;
             }
 
-            db.ref("balances").once("value").then(snapshot => {
-                const data = snapshot.val();
-                if (!data || data[currentUser] < amount) {
+            // Firebase tranzakció használata a biztonságos frissítéshez
+            db.ref("balances/" + currentUser).transaction(currentSenderBalance => {
+                // Ellenőrizzük, hogy van-e elég fedezet
+                if (currentSenderBalance === null || currentSenderBalance < amount) {
                     showMessage("message", "Nincs elég fedezet az utaláshoz!", true);
-                    return;
+                    return; // Abort the transaction
                 }
-                db.ref("balances/" + currentUser).set(data[currentUser] - amount);
-                db.ref("balances/" + receiver).set((data[receiver] || 0) + amount);
-                
-                showMessage("message", `Sikeres utalás: ${amount.toLocaleString('hu-HU')} Ft ${receiver} részére.`, false);
-                document.getElementById("amount").value = "";
-                document.getElementById("receiver").selectedIndex = 0;
+                return currentSenderBalance - amount; // Levonjuk az összeget
+            })
+            .then(senderResult => {
+                if (senderResult.committed) {
+                    // Ha a feladó egyenlegének levonása sikeres volt, hozzáadjuk a címzettnek
+                    db.ref("balances/" + receiver).transaction(currentReceiverBalance => {
+                        return (currentReceiverBalance || 0) + amount; // Hozzáadjuk az összeget
+                    })
+                    .then(receiverResult => {
+                        if (receiverResult.committed) {
+                            showMessage("message", `Sikeres utalás: ${amount.toLocaleString('hu-HU')} Ft ${receiver} részére.`, false);
+                            document.getElementById("amount").value = "";
+                            document.getElementById("receiver").selectedIndex = 0;
+                            // TRANZAKCIÓ RÖGZÍTÉSE ITT
+                            recordTransaction(currentUser, receiver, amount, `Utalás: ${amount} keksz`);
+                        } else if (receiverResult.error) {
+                            showMessage("message", `Hiba a címzett egyenlegének frissítésekor: ${receiverResult.error.message}`, true);
+                            console.error("Címzett egyenleg frissítési hiba:", receiverResult.error);
+                            // Itt érdemes lenne visszavonni a feladó tranzakcióját, vagy valamilyen hibakezelést végezni
+                        }
+                    });
+                } else if (senderResult.error) {
+                    showMessage("message", `Hiba az utalás során: ${senderResult.error.message}`, true);
+                    console.error("Feladó egyenleg frissítési hiba:", senderResult.error);
+                }
+            })
+            .catch(error => {
+                showMessage("message", `Váratlan hiba az utalás során: ${error.message}`, true);
+                console.error("Utalási tranzakció hiba:", error);
             });
         }
 
@@ -469,9 +516,18 @@
                 if (snap.exists()) {
                     showMessage("couponMessage", "Ezt a kupont már aktiváltad!", true);
                 } else {
-                    db.ref("coupons/" + currentUser + "/" + code).set(true);
-                    showMessage("couponMessage", `Kupon aktiválva: ${coupons[code]}`, false);
-                    document.getElementById("couponCode").value = "";
+                    db.ref("coupons/" + currentUser + "/" + code).set(true)
+                    .then(() => {
+                        showMessage("couponMessage", `Kupon aktiválva: ${coupons[code]}`, false);
+                        document.getElementById("couponCode").value = "";
+                        // TRANZAKCIÓ RÖGZÍTÉSE ITT, ha kupon beváltása történt
+                        // (csak az aktiválás tényét rögzítjük, nem az 1000KEKSZ levonást még)
+                        recordTransaction(currentUser, 'Rendszer', 0, `Kupon aktiválása: ${coupons[code]} (Kód: ${code})`);
+                    })
+                    .catch(error => {
+                        console.error("Hiba a kupon aktiválásakor:", error);
+                        showMessage("couponMessage", "Hiba a kupon aktiválásakor!", true);
+                    });
                 }
             });
         }
@@ -485,28 +541,60 @@
                     listEl.innerHTML = "<li>Nincsenek aktív kuponjaid.</li>";
                     return;
                 }
-                Object.keys(data).forEach(code => {
-                    const li = document.createElement("li");
-                    li.textContent = coupons[code] || code;
-                    const btn = document.createElement("button");
-                    btn.textContent = "Felhasználom";
-                    btn.className = "coupon-btn";
-                    btn.onclick = () => useCoupon(code);
-                    li.appendChild(btn);
-                    listEl.appendChild(li);
+                // Sorrendezés (opcionális, de hasznos lehet)
+                const sortedCodes = Object.keys(data).sort(); // ABC sorrendben
+
+                sortedCodes.forEach(code => {
+                    // Csak akkor jelenítjük meg, ha a kupon definíciókban is szerepel
+                    if (coupons[code]) { 
+                        const li = document.createElement("li");
+                        li.textContent = coupons[code]; // Használjuk a leírást
+                        const btn = document.createElement("button");
+                        btn.textContent = "Felhasználom";
+                        btn.className = "coupon-btn";
+                        btn.onclick = () => useCoupon(code);
+                        li.appendChild(btn);
+                        listEl.appendChild(li);
+                    }
                 });
             });
         }
 
         function useCoupon(code) {
-            db.ref("coupons/" + currentUser + "/" + code).remove();
-            if (code === "1000KEKSZ") {
-                db.ref("balances/" + currentUser).once("value", snap => {
-                    const bal = Math.max(0, (snap.val() || 0) - 1000);
-                    db.ref("balances/" + currentUser).set(bal);
-                });
-            }
-            showMessage("couponMessage", `Felhasználtad: ${coupons[code]}`, false);
+            db.ref("coupons/" + currentUser + "/" + code).remove()
+            .then(() => {
+                let transactionAmount = 0;
+                let transactionDescription = `Kupon felhasználva: ${coupons[code]}`;
+
+                if (code === "1000KEKSZ") {
+                    // Az 1000KEKSZ kupon különleges kezelése (egyensúly levonás)
+                    db.ref("balances/" + currentUser).transaction(currentBalance => {
+                        transactionAmount = -1000; // Negatív összeg az elvonás jelzésére
+                        transactionDescription += " (-1000 keksz)"; // Hozzáadjuk a leíráshoz
+                        return Math.max(0, (currentBalance || 0) - 1000); // Ne menjen mínuszba
+                    })
+                    .then(result => {
+                        if (result.committed) {
+                            showMessage("couponMessage", `Felhasználtad: ${coupons[code]}`, false);
+                            // TRANZAKCIÓ RÖGZÍTÉSE ITT (1000KEKSZ levonás)
+                            recordTransaction(currentUser, 'Rendszer', transactionAmount, transactionDescription);
+                        } else if (result.error) {
+                            showMessage("couponMessage", `Hiba a keksz levonásakor: ${result.error.message}`, true);
+                            console.error("Keksz levonási hiba:", result.error);
+                            // Ha hiba van a levonásnál, visszategyük a kupont? Vagy értesítjük az admint?
+                        }
+                    });
+                } else {
+                    // Nem keksz alapú kuponok
+                    showMessage("couponMessage", `Felhasználtad: ${coupons[code]}`, false);
+                    // TRANZAKCIÓ RÖGZÍTÉSE ITT (nem keksz alapú kupon felhasználás)
+                    recordTransaction(currentUser, 'Rendszer', 0, transactionDescription); // 0 összeggel, ha nem pénzmozgás
+                }
+            })
+            .catch(error => {
+                console.error("Hiba a kupon eltávolításakor:", error);
+                showMessage("couponMessage", "Hiba a kupon felhasználásakor!", true);
+            });
         }
         
         // Indító függvények

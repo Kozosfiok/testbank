@@ -34,10 +34,12 @@
             box-sizing: border-box;
             color: var(--text-color-light);
             position: relative;
-            overflow: hidden;
+            /* A fő változtatás: engedélyezi a görgetést */
+            **overflow-y: auto;** /* Lehetővé teszi a függőleges görgetést, ha a tartalom túlságosan nagy */
+            **overflow-x: hidden;** /* Elrejti a vízszintes görgetősávot */
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* Tartalom felülről indul */
             align-items: center;
         }
 
@@ -262,9 +264,9 @@
         }
 
         .site-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            /* Változtatás a lábléc pozícióján */
+            **position: relative;** /* Relatív pozíció, hogy a görgetéssel együtt mozogjon */
+            **width: 100%;**
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -275,7 +277,7 @@
             font-size: 14px;
             z-index: 10;
             box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
-            margin-top: auto; /* Pushes footer to bottom if content is short */
+            **margin-top: 40px;** /* Hozzáad egy kis helyet a lábléc és a tartalom közé */
         }
 
         .site-footer p {

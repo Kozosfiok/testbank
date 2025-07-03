@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Of MAMA - Leggazdagabb Ügyfelek</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a82fb;
+            --secondary-color: #fc5c7d;
+            --accent-color: #ffc847;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #1a2238;
+            --header-height: 80px;
+        }
+
+        /* === Alapstílusok és Animált Háttér === */
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            margin: 0;
+            padding-top: calc(var(--header-height) + 30px);
+            padding-bottom: 90px;
+            color: var(--text-color);
+            background: linear-gradient(45deg, #6a82fb, #fc5c7d, #ffc847, #54e2d2);
+            background-size: 400% 400%;
+            animation: gradient-flow 20s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* === Fejléc === */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* Navigáció elrejtése ezen az oldalon */
+        .menu-toggle, .nav-menu {
+            display: none;
+        }
+
+        /* === Fő Tartalom (Kártya) === */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px 45px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+            border: 1px solid var(--glass-border);
+            max-width: 500px;
+            width: 90%;
+            margin: 20px auto;
+            box-sizing: border-box;
+            animation: card-enter 0.8s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        h1 { font-size: 2.3em; margin-bottom: 10px; }
+        hr { border: none; border-top: 1px solid var(--glass-border); margin: 35px 0;}
+
+        /* === Leggazdagabb lista stílusai === */
+        .richest-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+        .richest-list li {
+            background: rgba(255, 255, 255, 0.7); /* Enyhén áttetsző fehér háttér */
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Áttetsző keret */
+            border-radius: 12px;
+            margin-bottom: 15px;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15em;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .richest-list li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .richest-list li span:first-child {
+            color: var(--primary-color);
+            flex-grow: 1; /* Név foglaljon több helyet */
+            text-align: left;
+        }
+        .richest-list li span:last-child {
+            color: var(--text-color);
+            white-space: nowrap; /* Ne törjön sort az összeg */
+            margin-left: 15px;
+        }
+
+        #loadingMessage {
+            font-style: italic;
+            color: var(--text-color);
+            margin-top: 20px;
+        }
+
+        /* === Gombok === */
+        .button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            padding: 16px 25px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-size: 200% auto;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:hover {
+            background-position: right center;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* === Lábléc === */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .site-footer a { color: white; text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        /* === Reszponzivitás === */
+        @media (max-width: 768px) {
+            .card { padding: 25px; }
+            h1 { font-size: 2em; }
+            .header { padding: 0 20px; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+    </header>
+
+    <main class="card">
+        <h1 id="bankTitle">Bank Of MAMA – Legvagyonosabb Ügyfeleink</h1>
+        
+        <p id="loadingMessage">Adatok betöltése...</p>
+        <ul class="richest-list" id="richestUsersList" style="display: none;">
+            </ul>
+
+        <hr />
+
+        <button class="button" onclick="history.back()">Vissza az előző oldalra</button>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
+
+    <script>
+        // Firebase Konfiguráció - HASZNÁLD A SAJÁT ADATAIDAT!
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+
+        // Inicializáljuk a Firebase-t
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        /**
+         * Lekérdezi és megjeleníti a 3 leggazdagabb ügyfelet a Firebase adatbázisból.
+         */
+        function displayRichestUsers() {
+            const listEl = document.getElementById("richestUsersList");
+            const loadingMsg = document.getElementById("loadingMessage");
+            loadingMsg.style.display = 'block'; // Betöltő üzenet megjelenítése
+            listEl.style.display = 'none'; // Lista elrejtése
+
+            // Lekérdezzük az összes egyenleget, rendezzük csökkenő sorrendben és limitáljuk 3-ra
+            db.ref('balances').orderByValue().limitToLast(3).on('value', (snapshot) => {
+                const users = [];
+                snapshot.forEach((childSnapshot) => {
+                    const userName = childSnapshot.key;
+                    const balance = childSnapshot.val();
+                    users.push({ name: userName, balance: balance });
+                });
+
+                // Rendezés csökkenő sorrendben (Firebase limitToLast már adja a legnagyobbakat, de ez biztosítja a helyes sorrendet)
+                users.sort((a, b) => b.balance - a.balance);
+
+                listEl.innerHTML = ""; // Töröljük a korábbi elemeket
+                if (users.length === 0) {
+                    listEl.innerHTML = "<li>Nincs megjeleníthető adat.</li>";
+                } else {
+                    users.forEach((user, index) => {
+                        const li = document.createElement("li");
+                        // Formázzuk a pénzösszeget magyar pénznem formátumba
+                        const formattedBalance = user.balance.toLocaleString('hu-HU') + " Ft";
+                        li.innerHTML = `
+                            <span>${index + 1}. ${user.name}</span>
+                            <span>${formattedBalance}</span>
+                        `;
+                        listEl.appendChild(li);
+                    });
+                }
+                loadingMsg.style.display = 'none'; // Betöltő üzenet elrejtése
+                listEl.style.display = 'block'; // Lista megjelenítése
+            }, (error) => {
+                console.error("Hiba a leggazdagabb felhasználók lekérdezésekor:", error);
+                loadingMsg.textContent = "Hiba az adatok betöltésekor.";
+                loadingMsg.style.color = '#d32f2f'; // Hibaüzenet színe
+            });
+        }
+
+        // Fő bank címének beállítása dinamikusan, ha szeretnéd
+        // Például lekérdezheted a bejelentkezett felhasználó adataitól, vagy egy globális beállításból.
+        // Most statikusan "Bank Név"-et használunk, de ezt Firebase-ből is szedheted.
+        // document.getElementById("bankTitle").textContent = "Máté Bankja – Legvagyonosabb Ügyfeleink";
+
+        // Az oldal betöltésekor hívjuk meg a függvényt
+        document.addEventListener('DOMContentLoaded', displayRichestUsers);
+    </script>
+</body>
+</html>
