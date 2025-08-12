@@ -257,8 +257,8 @@
             <input type="number" id="productPrice" placeholder="Pl.: 1500" required>
         </div>
         <div class="input-group">
-            <label for="productImage">Kép URL-je</label>
-            <input type="text" id="productImage" placeholder="Pl.: https://example.com/kep.jpg" required>
+            <label for="productImage">Kép URL-je (opcionális)</label>
+            <input type="text" id="productImage" placeholder="Pl.: https://example.com/kep.jpg">
         </div>
 
         <button class="button" onclick="uploadProduct()">Termék feltöltése</button>
@@ -303,28 +303,49 @@
             const el = document.getElementById(elementId);
             el.textContent = text;
             el.className = 'message ' + (isError ? 'error' : 'success');
-            setTimeout(() => { el.textContent = ''; }, 4000);
+            setTimeout(() => { el.textContent = ''; el.className = 'message'; }, 4000); // Clear message and classes
         }
 
         function uploadProduct() {
             const productName = document.getElementById("productName").value.trim();
             const productDescription = document.getElementById("productDescription").value.trim();
             const productPrice = parseInt(document.getElementById("productPrice").value);
-            const productImage = document.getElementById("productImage").value.trim();
+            let imageUrl = document.getElementById("productImage").value.trim(); // Changed to let
 
-            if (!productName || !productDescription || isNaN(productPrice) || productPrice <= 0 || !productImage) {
-                showMessage("message", "Kérlek, tölts ki minden mezőt érvényes adatokkal!", true);
+            // Alapvető validáció
+            if (!productName || !productDescription || isNaN(productPrice) || productPrice <= 0) {
+                showMessage("message", "Kérlek, töltsd ki a termék nevét, leírását és egy érvényes árat!", true);
                 return;
             }
 
-            const newProductRef = db.ref('products').push();
+            // Kép URL validáció: ha van URL, ellenőrizzük, különben használjuk az alapértelmezett placeholder-t
+            if (imageUrl && !/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.+)?$/i.test(imageUrl)) {
+                showMessage("message", "Kérlek, adj meg egy érvényes kép URL-t (http/https és képformátum), vagy hagyd üresen!", true);
+                return;
+            }
+
+            // Ha az imageUrl üres, használjuk a placeholder URL-t
+            if (!imageUrl) {
+                // Generálunk egy véletlen placeholder képet, hogy változatosabb legyen
+                const placeholderWidth = 400;
+                const placeholderHeight = 300;
+                const placeholderText = encodeURIComponent(productName.substring(0, 15)); // A termék nevének első része
+                imageUrl = `https://placehold.co/${placeholderWidth}x${placeholderHeight}/cccccc/333333?text=${placeholderText}`;
+            }
+
+            // KORREKCIÓ: A Firebase útvonal "marketplace/products"
+            const productsRef = db.ref('marketplace/products');
+            const newProductRef = productsRef.push();
+            
             newProductRef.set({
+                id: newProductRef.key, // Firebase generált ID hozzáadása
                 name: productName,
                 description: productDescription,
                 price: productPrice,
-                imageUrl: productImage,
+                imageUrl: imageUrl, // A közvetlenül megadott URL (vagy a generált placeholder)
                 seller: currentUser,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                isSold: false // Új termék feltöltésekor alapértelmezetten nincs eladva
             })
             .then(() => {
                 showMessage("message", "Termék sikeresen feltöltve!", false);
@@ -332,10 +353,11 @@
                 document.getElementById("productName").value = "";
                 document.getElementById("productDescription").value = "";
                 document.getElementById("productPrice").value = "";
-                document.getElementById("productImage").value = "";
+                document.getElementById("productImage").value = ""; 
             })
             .catch(error => {
-                showMessage("message", `Hiba a termék feltöltésekor: ${error.message}`, true);
+                console.error("Hiba a termék feltöltésekor:", error);
+                showMessage("message", `Hiba a feltöltéskor: ${error.message}`, true);
             });
         }
     </script>
