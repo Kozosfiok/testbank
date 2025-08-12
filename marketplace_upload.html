@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank of Mama Marketplace - Termék Feltöltés</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a82fb;
+            --secondary-color: #fc5c7d;
+            --accent-color: #ffc847;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #1a2238;
+            --header-height: 80px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            margin: 0;
+            padding-top: calc(var(--header-height) + 30px);
+            padding-bottom: 90px;
+            color: var(--text-color);
+            background: linear-gradient(45deg, #6a82fb, #fc5c7d, #ffc847, #54e2d2);
+            background-size: 400% 400%;
+            animation: gradient-flow 20s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* Új stílus a felhasználónév kijelzéséhez és a kijelentkezés gombhoz */
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Jobbra igazítja a logóhoz képest */
+            padding-right: 20px;
+        }
+
+        .user-greeting {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-right: 15px; /* Távolság a gombhoz */
+        }
+
+        .logout-button {
+            background-color: #dc3545; /* Piros szín */
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        .logout-button:active {
+            transform: translateY(0px) scale(0.98);
+        }
+
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px 45px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+            border: 1px solid var(--glass-border);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+            box-sizing: border-box;
+            animation: card-enter 0.8s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        h1 { font-size: 2.3em; margin-bottom: 10px; }
+        hr { border: none; border-top: 1px solid var(--glass-border); margin: 35px 0;}
+
+        .input-group {
+            position: relative;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        input[type="text"], input[type="number"], textarea {
+            font-family: 'Poppins', sans-serif;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.75);
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(106, 130, 251, 0.5);
+        }
+
+        .button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            padding: 16px 25px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-size: 200% auto;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-position: right center;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .message { min-height: 24px; font-weight: 600; transition: all 0.3s; margin-top: 15px;}
+        .error { color: #d32f2f; }
+        .success { color: #2e7d32; }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .site-footer a { color: white; text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        .back-button {
+            background-color: #008CBA;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .back-button:hover {
+            background-color: #007B9A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <header class="header">
+        <a href="mate.html">
+            <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+        </a>
+        <div class="user-info">
+            <span class="user-greeting" id="userGreeting">Üdv, kedves felhasználó!</span>
+            <button class="logout-button" onclick="logout()">Kijelentkezés</button>
+        </div>
+    </header>
+
+    <main class="card">
+        <h1>Termék Feltöltése</h1>
+        <p>Adj el valamit a Bank Of MAMA piacterén!</p>
+        
+        <div class="input-group">
+            <label for="productName">Termék neve</label>
+            <input type="text" id="productName" placeholder="Pl.: Kézzel festett bögre" required>
+        </div>
+        <div class="input-group">
+            <label for="productDescription">Leírás</label>
+            <textarea id="productDescription" placeholder="Írj egy rövid leírást a termékről..." required></textarea>
+        </div>
+        <div class="input-group">
+            <label for="productPrice">Ár (Ft)</label>
+            <input type="number" id="productPrice" placeholder="Pl.: 1500" required>
+        </div>
+        <div class="input-group">
+            <label for="productImage">Kép URL-je</label>
+            <input type="text" id="productImage" placeholder="Pl.: https://example.com/kep.jpg" required>
+        </div>
+
+        <button class="button" onclick="uploadProduct()">Termék feltöltése</button>
+        <p id="message" class="message"></p>
+
+        <a href="marketplace_display.html" class="back-button">Vissza a piactérre</a>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
+
+    <script>
+        const currentUser = sessionStorage.getItem('loggedInUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('userGreeting').textContent = `Üdv, ${currentUser}!`;
+
+        function logout() {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+
+        // CSERÉLD LE EZT A SAJÁT FIREBASE KONFIGURÁCIÓDVAL!
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function showMessage(elementId, text, isError) {
+            const el = document.getElementById(elementId);
+            el.textContent = text;
+            el.className = 'message ' + (isError ? 'error' : 'success');
+            setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        function uploadProduct() {
+            const productName = document.getElementById("productName").value.trim();
+            const productDescription = document.getElementById("productDescription").value.trim();
+            const productPrice = parseInt(document.getElementById("productPrice").value);
+            const productImage = document.getElementById("productImage").value.trim();
+
+            if (!productName || !productDescription || isNaN(productPrice) || productPrice <= 0 || !productImage) {
+                showMessage("message", "Kérlek, tölts ki minden mezőt érvényes adatokkal!", true);
+                return;
+            }
+
+            const newProductRef = db.ref('products').push();
+            newProductRef.set({
+                name: productName,
+                description: productDescription,
+                price: productPrice,
+                imageUrl: productImage,
+                seller: currentUser,
+                timestamp: new Date().toISOString()
+            })
+            .then(() => {
+                showMessage("message", "Termék sikeresen feltöltve!", false);
+                // Clear the form
+                document.getElementById("productName").value = "";
+                document.getElementById("productDescription").value = "";
+                document.getElementById("productPrice").value = "";
+                document.getElementById("productImage").value = "";
+            })
+            .catch(error => {
+                showMessage("message", `Hiba a termék feltöltésekor: ${error.message}`, true);
+            });
+        }
+    </script>
+</body>
+</html>

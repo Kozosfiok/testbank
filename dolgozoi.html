@@ -129,25 +129,29 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        #inputForm {
-            max-width: 450px; /* Slightly wider form */
+        .form-section { /* New class for both inputForm and issueBillSection */
+            max-width: 450px;
             margin: 30px auto;
-            padding: 30px; /* More padding */
-            display: none;
+            padding: 30px;
             text-align: left;
-            color: var(--text-color-dark); /* Dark text for form content */
-            animation: fadeIn 0.8s ease-out; /* Fade in animation for the form itself */
+            color: var(--text-color-dark);
+            animation: fadeIn 0.8s ease-out;
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        
+        #inputForm {
+            display: none; /* Keep hidden by default */
         }
 
-        #inputForm h2 {
+        .form-section h2 {
             margin-bottom: 25px;
             font-size: 1.8em;
             font-weight: 600;
-            color: var(--primary-blue); /* Blue for form title */
+            color: var(--primary-blue);
             text-align: center;
         }
 
-        #inputForm label {
+        .form-section label {
             display: block;
             margin-top: 15px;
             margin-bottom: 5px;
@@ -156,59 +160,61 @@
             color: var(--text-color-dark);
         }
 
-        #inputForm input[type="number"],
-        #inputForm select {
+        .form-section input[type="number"],
+        .form-section select,
+        .form-section input[type="text"] {
             width: calc(100% - 24px); /* Account for padding */
             padding: 12px;
             margin: 10px 0;
             font-size: 1em;
             box-sizing: border-box;
-            border: 1px solid #ddd; /* Lighter border */
+            border: 1px solid #ddd;
             border-radius: 8px;
-            background-color: #f8f8f8; /* Slightly off-white background */
+            background-color: #f8f8f8;
             transition: all 0.3s ease;
             color: var(--text-color-dark);
-            -webkit-appearance: none; /* Remove default select arrow on WebKit */
-            -moz-appearance: none; /* Remove default select arrow on Firefox */
-            appearance: none; /* Remove default select arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
-        #inputForm input[type="number"]:focus,
-        #inputForm select:focus {
+        .form-section input[type="number"]:focus,
+        .form-section select:focus,
+        .form-section input[type="text"]:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Blue focus ring */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
             background-color: #fff;
         }
 
         /* Custom arrow for select */
-        #inputForm .select-wrapper {
+        .form-section .select-wrapper {
             position: relative;
             width: 100%;
         }
 
-        #inputForm .select-wrapper::after {
-            content: '▼'; /* Unicode down arrow */
+        .form-section .select-wrapper::after {
+            content: '▼';
             font-size: 0.8em;
             color: #888;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
             position: absolute;
-            pointer-events: none; /* Ensures clicks go through to the select */
+            pointer-events: none;
         }
 
 
-        #inputForm input[type="radio"] {
+        .form-section input[type="radio"] {
             margin-right: 5px;
             vertical-align: middle;
-            width: auto; /* Allow radio buttons to be natural width */
+            width: auto;
             padding: 0;
             margin-top: 0;
             margin-bottom: 0;
         }
 
-        #inputForm input[type="radio"] + label {
+        .form-section input[type="radio"] + label {
             display: inline-block;
             margin-right: 20px;
             font-weight: 400;
@@ -216,7 +222,7 @@
             cursor: pointer;
         }
 
-        #inputForm button {
+        .form-section button {
             width: 100%;
             padding: 12px 20px;
             background-color: var(--primary-blue);
@@ -226,21 +232,21 @@
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 500;
-            margin-top: 25px; /* More space above buttons */
+            margin-top: 25px;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             outline: none;
         }
 
-        #inputForm button:hover {
+        .form-section button:hover {
             background-color: var(--primary-blue-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
 
-        #inputForm button:focus {
+        .form-section button:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5); /* Custom focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5);
         }
 
         #message {
@@ -253,8 +259,8 @@
         }
 
         .error {
-            color: #D8000C; /* Darker red text */
-            background-color: #FFD2D2; /* Light red background */
+            color: #D8000C;
+            background-color: #FFD2D2;
         }
 
         .success {
@@ -376,14 +382,14 @@
                 font-size: 13px;
                 padding: 8px 12px;
             }
-            #inputForm {
+            .form-section { /* Both forms adjusted */
                 padding: 25px;
                 max-width: 90%;
             }
-            #inputForm h2 {
+            .form-section h2 { /* Both forms adjusted */
                 font-size: 1.5em;
             }
-            #inputForm input, #inputForm select, #inputForm button {
+            .form-section input, .form-section select, .form-section button { /* Both forms adjusted */
                 font-size: 0.95em;
                 padding: 10px;
             }
@@ -411,14 +417,14 @@
                 font-size: 12px;
                 padding: 7px 10px;
             }
-            #inputForm {
+            .form-section { /* Both forms adjusted */
                 padding: 20px;
                 max-width: 95%;
             }
-            #inputForm h2 {
+            .form-section h2 { /* Both forms adjusted */
                 font-size: 1.3em;
             }
-            #inputForm input, #inputForm select, #inputForm button {
+            .form-section input, .form-section select, .form-section button { /* Both forms adjusted */
                 font-size: 0.9em;
                 padding: 8px;
             }
@@ -444,7 +450,7 @@
     <video id="video" muted playsinline></video>
     <div id="output">QR kód beolvasása...</div>
 
-    <div id="inputForm" class="glass-effect">
+    <div id="inputForm" class="glass-effect form-section">
         <h2 id="userTitle"></h2>
 
         <label for="amount">Keksz (kézpénz) összege (Ft):</label>
@@ -482,6 +488,30 @@
         </div>
     </div>
 
+    <!-- NEW: Bill Issuance Form -->
+    <div id="issueBillSection" class="glass-effect form-section">
+        <h2>Számla/Adó Kiszabása</h2>
+        <div class="input-group">
+            <label for="billRecipient">Címzett:</label>
+            <div class="select-wrapper">
+                <select id="billRecipient">
+                    <option value="all">Mindenki</option>
+                    <!-- User list will be populated here -->
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="billAmount">Összeg (Ft):</label>
+            <input type="number" id="billAmount" placeholder="Pl. 2500" min="1" required>
+        </div>
+        <div class="input-group">
+            <label for="billName">Számla/Adó neve:</label>
+            <input type="text" id="billName" placeholder="Pl. Havi adó, Bár számla" required>
+        </div>
+        <button onclick="issueBill()" class="button">Számla Kiszabása</button>
+        <div id="issueBillMessage" class="message"></div>
+    </div>
+
     <footer class="site-footer">
         <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
     </footer>
@@ -505,6 +535,32 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Ensure "Államkincstár" user exists and has a balance
+        const STATE_TREASURY_USER = "Államkincstár";
+
+        // Function to create or ensure "Államkincstár" user and balance
+        async function ensureStateTreasuryUser() {
+            try {
+                const userRef = db.ref(`users/${STATE_TREASURY_USER}`);
+                const balanceRef = db.ref(`balances/${STATE_TREASURY_USER}`);
+
+                const userSnapshot = await userRef.once('value');
+                if (!userSnapshot.exists()) {
+                    await userRef.set({ password: "auto_generated_password" }); // No real password needed for automated user
+                    console.log(`${STATE_TREASURY_USER} user created.`);
+                }
+
+                const balanceSnapshot = await balanceRef.once('value');
+                if (!balanceSnapshot.exists()) {
+                    await balanceRef.set(0); // Initialize balance to 0
+                    console.log(`${STATE_TREASURY_USER} balance initialized.`);
+                }
+            } catch (error) {
+                console.error("Error ensuring State Treasury user:", error);
+            }
+        }
+
+
         const video = document.getElementById("video");
         const output = document.getElementById("output");
         const inputForm = document.getElementById("inputForm");
@@ -518,6 +574,12 @@
         const notificationSound = document.getElementById("notificationSound");
         const successSound = document.getElementById("successSound");
         const notSuccessSound = document.getElementById("notSuccessSound");
+
+        // Számla kiszabás elemei
+        const billRecipientSelect = document.getElementById("billRecipient");
+        const billAmountInput = document.getElementById("billAmount");
+        const billNameInput = document.getElementById("billName");
+        const issueBillMessage = document.getElementById("issueBillMessage");
 
         let scanning = false;
         let scannedUser = null;
@@ -809,8 +871,91 @@
             startCamera();
         }
 
+        // --- NEW: Bill Issuance Logic ---
+        function populateBillRecipientDropdown() {
+            db.ref('users').once('value')
+                .then(snapshot => {
+                    billRecipientSelect.innerHTML = '<option value="all">Mindenki</option>'; // Alapértelmezett "Mindenki" opció
+                    snapshot.forEach(childSnapshot => {
+                        const username = childSnapshot.key;
+                        if (username !== STATE_TREASURY_USER) { // Ne lehessen az Államkincstárnak kiszabni
+                            const option = document.createElement('option');
+                            option.value = username;
+                            option.textContent = username;
+                            billRecipientSelect.appendChild(option);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("Hiba a címzettek betöltésekor:", error);
+                });
+        }
+
+        async function issueBill() {
+            const recipient = billRecipientSelect.value;
+            const amount = parseInt(billAmountInput.value);
+            const billName = billNameInput.value.trim();
+
+            if (!billName || isNaN(amount) || amount <= 0) {
+                issueBillMessage.textContent = "Kérlek, add meg a számla nevét és egy pozitív összeget!";
+                issueBillMessage.className = "error";
+                return;
+            }
+
+            const issueDate = new Date();
+            const dueDate = new Date();
+            dueDate.setDate(issueDate.getDate() + 3); // 3 nap múlva esedékes
+
+            const billData = {
+                amount: amount,
+                name: billName,
+                issuedBy: STATE_TREASURY_USER,
+                issueDate: issueDate.toISOString(),
+                dueDate: dueDate.toISOString(),
+                paid: false,
+                penaltyApplied: false // Új mező a büntetés alkalmazásának jelölésére
+            };
+
+            let recipientsToBill = [];
+            if (recipient === "all") {
+                const userSnapshot = await db.ref('users').once('value');
+                userSnapshot.forEach(childSnapshot => {
+                    const username = childSnapshot.key;
+                    if (username !== STATE_TREASURY_USER) {
+                        recipientsToBill.push(username);
+                    }
+                });
+            } else {
+                recipientsToBill.push(recipient);
+            }
+
+            try {
+                for (const user of recipientsToBill) {
+                    const newBillRef = db.ref('bills').push();
+                    await newBillRef.set({
+                        id: newBillRef.key, // Firebase generált ID hozzáadása
+                        recipient: user,
+                        ...billData
+                    });
+                    // Tranzakció rögzítése a bill kiszabásáról
+                    recordTransaction(STATE_TREASURY_USER, user, 0, `Számla kiszabva: "${billName}" (${amount} Ft)`);
+                }
+                issueBillMessage.textContent = "Számla(ák) sikeresen kiszabva!";
+                issueBillMessage.className = "success";
+                billAmountInput.value = "";
+                billNameInput.value = "";
+                billRecipientSelect.value = "all"; // Reset to "Mindenki"
+            } catch (error) {
+                issueBillMessage.textContent = "Hiba a számla kiszabásakor: " + error.message;
+                issueBillMessage.className = "error";
+                console.error("Bill issuance error:", error);
+            }
+        }
+
         window.onload = () => {
+            ensureStateTreasuryUser(); // Ensure State Treasury user exists on load
             startCamera();
+            populateBillRecipientDropdown(); // Populate recipient dropdown for bills
         };
     </script>
 </body>

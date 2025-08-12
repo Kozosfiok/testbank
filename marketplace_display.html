@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank of Mama Marketplace</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS variables from the original design */
+        :root {
+            --primary-color: #6a82fb;
+            --secondary-color: #fc5c7d;
+            --accent-color: #ffc847;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #1a2238;
+            --header-height: 80px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif !important; /* Font-family megerősítése */
+            text-align: center;
+            margin: 0;
+            padding-top: calc(var(--header-height) + 30px);
+            padding-bottom: 90px;
+            color: var(--text-color);
+            background: linear-gradient(45deg, #6a82fb, #fc5c7d, #ffc847, #54e2d2);
+            background-size: 400% 400%;
+            animation: gradient-flow 20s ease infinite;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            padding-right: 20px;
+        }
+
+        .user-greeting {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-right: 15px;
+        }
+
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        .logout-button:active {
+            transform: translateY(0px) scale(0.98);
+        }
+        
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px 45px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+            border: 1px solid var(--glass-border);
+            max-width: 900px;
+            width: 90%;
+            margin: 20px auto;
+            box-sizing: border-box;
+            animation: card-enter 0.8s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        hr { border: none; border-top: 1px solid var(--glass-border); margin: 35px 0;}
+
+        .message { min-height: 24px; font-weight: 600; transition: all 0.3s; margin-top: 15px;}
+        .error { color: #d32f2f; }
+        .success { color: #2e7d32; }
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .site-footer a { color: white; text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .primary-button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            padding: 16px 25px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-size: 200% auto;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            flex-grow: 1;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .primary-button:hover {
+            background-position: right center;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .primary-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Product Grid & Card Styles (HTML based) */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 24px;
+            margin-top: 32px;
+            width: 100%;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.8); /* Translucent white background, like "glass-bg" */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5); /* Lighter border */
+            border-radius: 16px; /* Rounded corners */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Shadow */
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animation */
+            transform-origin: center;
+            position: relative; /* For positioning */
+            min-height: 400px; /* Default height */
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 160px; /* Fixed height for images */
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card h3 {
+            font-size: 1.35em; /* Larger name */
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            line-height: 1.2;
+            text-align: center; /* Center alignment */
+            width: 100%;
+        }
+
+        .product-card p {
+            font-size: 0.9em;
+            color: #4a5568; /* Darker gray */
+            margin-bottom: 4px;
+            width: 100%;
+        }
+
+        .product-card .description {
+            font-size: 0.8em; /* Smaller description */
+            color: #718096; /* Lighter gray */
+            margin-bottom: 16px;
+            height: 48px; /* Fixed height for approx. 3 lines */
+            overflow: hidden; /* Truncate if too long */
+            text-align: left; /* Left alignment */
+            line-height: 1.5;
+        }
+
+        .product-card .price {
+            font-size: 1.5em; /* Larger price */
+            font-weight: 700;
+            color: var(--accent-color); /* Yellow color */
+            margin-top: auto; /* Aligns price to the bottom within the card */
+            margin-bottom: 8px;
+            width: 100%;
+            text-align: right; /* Right alignment */
+        }
+
+        .product-card .seller {
+            font-size: 0.75em; /* Even smaller */
+            color: #a0aec0; /* Very light gray */
+            margin-bottom: 16px;
+            width: 100%;
+            text-align: left; /* Left alignment */
+        }
+
+        .product-card button {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            width: calc(100% - 20px); /* Smaller to allow margin */
+            padding: 10px 15px;
+            background-color: #28a745; /* Green */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-card button:hover {
+            background-color: #218838; /* Darker green */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .product-card button:active {
+            transform: translateY(0px) scale(0.98);
+        }
+
+        .no-products-message {
+            color: var(--text-color);
+            font-size: 1.2em;
+            margin-top: 40px;
+        }
+        
+        /* Modal Overlay for Confirm */
+        .fixed.inset-0.bg-black.bg-opacity-50 {
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        .fixed.inset-0.bg-black.bg-opacity-50.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Media queries for smaller screens - does not include h1 */
+    </style>
+    <!-- Firebase JS SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <header class="header">
+        <a href="mate.html">
+            <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+        </a>
+        <div class="user-info">
+            <span id="userGreeting" class="user-greeting"></span>
+            <button class="logout-button" onclick="logout()">Kijelentkezés</button>
+        </div>
+    </header>
+
+    <main class="card">
+        <h1>Marketplace</h1>
+        <p class="text-xl">Jelenlegi egyenleged: <strong id="balance" class="text-blue-800">Betöltés...</strong></p>
+        <p id="message" class="message"></p>
+
+        <div id="loadingProducts" class="text-gray-600 text-lg mt-5">Termékek betöltése...</div>
+        <div id="productsContainer" class="product-grid">
+            <!-- Termékek ide kerülnek dinamikusan -->
+        </div>
+        <p id="noProductsMessage" class="no-products-message hidden">Jelenleg nincs eladó termék a marketplace-en.</p>
+
+        <hr />
+        <div class="button-group">
+            <a href="marketplace_upload.html" class="primary-button">Termék feltöltése</a>
+            <a href="mate.html" class="primary-button">Vissza a főoldalra</a>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
+
+    <script>
+        // Ellenőrzi, hogy a felhasználó be van-e jelentkezve, ha nem, átirányít
+        const currentUser = sessionStorage.getItem('loggedInUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        // Üdvözlő üzenet beállítása
+        document.getElementById('userGreeting').textContent = `Üdv, ${currentUser}!`;
+
+        // Kijelentkezés funkció
+        function logout() {
+            sessionStorage.removeItem('loggedInUser'); // Törli a bejelentkezett felhasználót
+            window.location.href = 'login.html'; // Vissza a bejelentkezési oldalra
+        }
+        
+        // Firebase Konfiguráció - CSERÉLD LE EZT A SAJÁT FIREBASE PROJEKTED ADATAIRA!
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // DOM elemek
+        const productsContainer = document.getElementById('productsContainer');
+        const loadingProductsMsg = document.getElementById('loadingProducts');
+        const noProductsMessage = document.getElementById('noProductsMessage');
+        const messageEl = document.getElementById('message'); // Az üzenet elem
+
+        function showMessage(text, isError) {
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + (isError ? 'error' : 'success');
+            setTimeout(() => { messageEl.textContent = '', messageEl.classList.remove('error', 'success'); }, 5000);
+        }
+
+        // Egyenleg kijelzésének frissítése
+        function updateBalanceDisplay() {
+            db.ref("balances/" + currentUser).on("value", snap => {
+                const value = snap.val() || 0;
+                document.getElementById("balance").textContent = value.toLocaleString('hu-HU') + " Ft";
+            });
+        }
+
+        // Tranzakció rögzítése a Firebase-ben
+        function recordTransaction(sender, receiver, amount, description) {
+            const transactionsRef = db.ref('transactions');
+            const newTransactionRef = transactionsRef.push(); 
+
+            newTransactionRef.set({
+                timestamp: new Date().toISOString(),
+                sender: sender,
+                receiver: receiver,
+                amount: amount,
+                description: description
+            })
+            .catch((error) => {
+                console.error("Hiba a tranzakció rögzítésekor: ", error);
+            });
+        }
+
+        // Termékek lekérése és megjelenítése
+        function fetchProducts() {
+            productsContainer.innerHTML = ''; 
+            loadingProductsMsg.classList.remove('hidden');
+            noProductsMessage.classList.add('hidden');
+
+            // MEGOLDÁS: A Firebase adatbázis útvonalának javítása
+            db.ref('marketplace/products').on('value', (snapshot) => { 
+                productsContainer.innerHTML = ''; 
+                const products = [];
+                snapshot.forEach((childSnapshot) => {
+                    const product = childSnapshot.val();
+                    // Csak azokat a termékeket jelenítjük meg, amelyek nincsenek eladva, ÉS nem a bejelentkezett felhasználó az eladó
+                    // Az 'isSold' alapértelmezett értéke false, ha nincs definiálva
+                    if (!(product.isSold === true) && product.seller !== currentUser) { 
+                        products.push(product);
+                    }
+                });
+
+                if (products.length === 0) {
+                    noProductsMessage.classList.remove('hidden');
+                    loadingProductsMsg.classList.add('hidden');
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    
+                    const imgElement = document.createElement('img');
+                    imgElement.src = product.imageUrl || 'https://placehold.co/250x160/cccccc/333333?text=Nincs%20k%C3%A9p'; 
+                    imgElement.alt = product.name;
+                    imgElement.onerror = function() {
+                        this.onerror=null; 
+                        this.src='https://placehold.co/250x160/cccccc/333333?text=K%C3%A9p%20hiba!'; 
+                    };
+                    productCard.appendChild(imgElement);
+
+                    const nameElement = document.createElement('h3');
+                    nameElement.textContent = product.name;
+                    productCard.appendChild(nameElement);
+
+                    const descriptionElement = document.createElement('p');
+                    descriptionElement.className = 'description';
+                    descriptionElement.textContent = product.description;
+                    productCard.appendChild(descriptionElement);
+
+                    const priceElement = document.createElement('p');
+                    priceElement.className = 'price';
+                    priceElement.textContent = `${product.price.toLocaleString('hu-HU')} Ft`;
+                    productCard.appendChild(priceElement);
+
+                    const sellerElement = document.createElement('p');
+                    sellerElement.className = 'seller';
+                    sellerElement.textContent = `Eladó: ${product.seller}`;
+                    productCard.appendChild(sellerElement);
+
+                    const buyButton = document.createElement('button');
+                    buyButton.textContent = 'Megveszem';
+                    buyButton.onclick = () => buyProduct(product.id, product.price, product.seller);
+                    productCard.appendChild(buyButton);
+
+                    productsContainer.appendChild(productCard);
+                });
+
+                loadingProductsMsg.classList.add('hidden'); 
+            }, (error) => {
+                console.error("Hiba a termékek lekérdezésekor:", error);
+                loadingProductsMsg.textContent = "Hiba a termékek betöltésekor.";
+                loadingProductsMsg.classList.add('error');
+            });
+        }
+
+        // Termék vásárlása
+        async function buyProduct(productId, productPrice, sellerName) {
+            const amount = parseInt(productPrice);
+
+            // Custom modal instead of confirm()
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
+            confirmModal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-4">
+                    <p class="text-xl font-semibold mb-6">Biztosan megvásárolod ezt a terméket <br><span class="text-blue-600">${amount.toLocaleString('hu-HU')} Ft</span>-ért?</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="confirmBuyBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Igen</button>
+                        <button id="cancelBuyBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Mégsem</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+
+            document.getElementById('confirmBuyBtn').onclick = async () => {
+                document.body.removeChild(confirmModal);
+                try {
+                    const buyerBalanceRef = db.ref(`balances/${currentUser}`);
+                    const sellerBalanceRef = db.ref(`balances/${sellerName}`);
+                    // MEGOLDÁS: A Firebase termék útvonalának javítása a vásárlásnál is
+                    const productRef = db.ref(`marketplace/products/${productId}`); 
+
+                    let buyerCurrentBalance = (await buyerBalanceRef.once('value')).val() || 0;
+                    if (buyerCurrentBalance < amount) {
+                        showMessage("message", "Nincs elég fedezet a vásárláshoz!", true);
+                        return;
+                    }
+
+                    // Tranzakció a vásárlónál
+                    const buyerTransactionResult = await buyerBalanceRef.transaction(currentBalance => {
+                        if (currentBalance === null || currentBalance < amount) {
+                            return undefined; 
+                        }
+                        return currentBalance - amount;
+                    });
+
+                    if (!buyerTransactionResult.committed) {
+                        showMessage("message", "Hiba történt a vásárló egyenlegének frissítésekor.", true);
+                        return;
+                    }
+
+                    // Tranzakció az eladónál
+                    await sellerBalanceRef.transaction(currentBalance => {
+                        return (currentBalance || 0) + amount;
+                    });
+
+                    // Termék státuszának frissítése (isSold)
+                    await productRef.update({
+                        isSold: true,
+                        buyer: currentUser,
+                        saleDate: new Date().toISOString()
+                    });
+
+                    showMessage("message", `Sikeres vásárlás! Kifizettél ${amount.toLocaleString('hu-HU')} Ft-ot.`, false);
+                    recordTransaction(currentUser, sellerName, -amount, `Marketplace vásárlás: ${productId} (${productPrice} Ft)`);
+                    recordTransaction(sellerName, currentUser, amount, `Marketplace eladás: ${productId} (${productPrice} Ft)`);
+                    
+                    // fetchProducts() automatically updates because of 'on("value")' listener
+                    updateBalanceDisplay(); 
+                    
+                } catch (error) {
+                    console.error("Hiba a vásárlás során:", error);
+                    showMessage("message", `Hiba a vásárlás során: ${error.message}`, true);
+                }
+            };
+            document.getElementById('cancelBuyBtn').onclick = () => {
+                document.body.removeChild(confirmModal);
+                showMessage("message", "Vásárlás megszakítva.", true);
+            };
+        }
+
+        // Oldal betöltésekor
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBalanceDisplay();
+            fetchProducts(); 
+        });
+    </script>
+</body>
+</html>

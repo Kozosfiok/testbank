@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Of MAMA Bejelentkezés</title>
+    <title>Bank Of MAMA Bejelentkezés/Regisztráció</title>
     <link rel="icon" href="logo.png" type="image/png" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -27,7 +27,6 @@
             background: linear-gradient(135deg, #FF6F61, #FFD000, #34B96F, #4A90E2, #8A2BE2);
             background-size: 400% 400%;
             animation: rainbowBackground 15s ease infinite;
-            overflow: hidden; /* Prevent scrollbars from the animation */
             position: relative;
         }
 
@@ -37,11 +36,10 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Glassmorphism Effect */
         .glass-effect {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             box-shadow: 0 8px 32px 0 var(--glass-shadow);
@@ -52,8 +50,9 @@
             text-align: center;
             width: 350px;
             max-width: 90%;
-            z-index: 1; /* Ensure it's above the background */
+            z-index: 1;
             animation: fadeIn 1s ease-out;
+            margin-top: 150px;
         }
 
         @keyframes fadeIn {
@@ -63,7 +62,7 @@
 
         .login-box h2 {
             margin-bottom: 30px;
-            color: var(--text-color-light); /* White text for contrast */
+            color: var(--text-color-light);
             font-weight: 600;
             letter-spacing: 0.5px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -72,13 +71,13 @@
         }
 
         .login-box input {
-            width: calc(100% - 24px); /* Account for padding */
+            width: calc(100% - 24px);
             padding: 12px;
             margin: 15px 0;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-color-light); /* White text for input */
+            color: var(--text-color-light);
             font-size: 16px;
             transition: all 0.3s ease;
         }
@@ -88,7 +87,7 @@
         }
 
         .login-box input:focus {
-            outline: none; /* Remove default focus outline */
+            outline: none;
             border-color: rgba(255, 255, 255, 0.6);
             background-color: rgba(255, 255, 255, 0.2);
             box-shadow: 0 0 0 2px var(--primary-blue);
@@ -107,22 +106,22 @@
             margin-top: 20px;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            outline: none; /* Remove default focus outline for button */
+            outline: none;
         }
 
         .login-box button:hover {
             background-color: var(--primary-blue-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3); /* Slightly larger shadow on hover */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
 
         .login-box button:focus {
-            outline: none; /* Ensure no outline on focus */
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5); /* Custom focus indication */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5);
         }
 
         .error {
-            color: #FFDDDD; /* Light red for errors */
+            color: #FFDDDD;
             background-color: rgba(255, 0, 0, 0.2);
             padding: 8px;
             border-radius: 5px;
@@ -138,7 +137,15 @@
             75% { transform: translateX(-5px); }
         }
 
-        /* Logo Styling */
+        .success {
+            color: #E2FFED;
+            background-color: rgba(0, 255, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
         .logo {
             position: absolute;
             top: 30px;
@@ -149,7 +156,6 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
 
-        /* Employee Login Box */
         .employee-login-box {
             position: absolute;
             top: 30px;
@@ -184,18 +190,17 @@
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
         }
 
-        /* New: Navigation Panel */
         .nav-panel {
             position: absolute;
-            top: 100px; /* Adjust based on employee login box height */
+            top: 100px;
             left: 30px;
-            padding: 20px 15px; /* Adjust padding to fit content */
+            padding: 20px 15px;
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             animation: fadeIn 1s ease-out;
-            min-width: 150px; /* Give it a minimum width */
+            min-width: 150px;
         }
 
         .nav-panel ul {
@@ -206,7 +211,7 @@
         }
 
         .nav-panel ul li {
-            margin-bottom: 15px; /* Spacing between links */
+            margin-bottom: 15px;
         }
 
         .nav-panel ul li:last-child {
@@ -218,15 +223,15 @@
             text-decoration: none;
             font-size: 1em;
             font-weight: 500;
-            padding: 8px 10px; /* Padding for click area */
-            display: block; /* Make the whole area clickable */
+            padding: 8px 10px;
+            display: block;
             border-radius: 6px;
             transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
         }
 
         .nav-panel ul li a:hover {
             background-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px); /* Subtle slide effect */
+            transform: translateX(5px);
             color: var(--text-color-light);
         }
 
@@ -235,7 +240,6 @@
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
         }
 
-        /* --- Footer Styles --- */
         .site-footer {
             position: fixed;
             bottom: 0;
@@ -258,7 +262,7 @@
         }
 
         .site-footer a {
-            color: #C0E0FF; /* Slightly brighter blue for links */
+            color: #C0E0FF;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease, text-decoration 0.3s ease;
@@ -269,7 +273,6 @@
             text-decoration: underline;
         }
 
-        /* Fade out for redirection */
         .fade-out {
             opacity: 0;
             transform: translateY(20px);
@@ -283,62 +286,36 @@
             transition: background 1s ease;
         }
 
-        /* --- Media Queries for Mobile Responsiveness --- */
+        .form-toggle {
+            margin-top: 20px;
+            color: var(--text-color-light);
+            text-decoration: underline;
+            cursor: pointer;
+        }
 
         @media (max-width: 480px) {
-    .login-box {
-        padding: 25px;
-        width: 95%;
-    }
-    .login-box h2 {
-        font-size: 1.4em;
-        margin-bottom: 15px;
-    }
-    .logo {
-        width: 70px;
-        top: 15px;
-        right: 15px;
-    }
-    .employee-login-box {
-        top: 15px;
-        left: 15px;
-    }
-    .employee-login-box button {
-        font-size: 12px;
-        padding: 7px 10px;
-    }
-    /* Módosított: A navigációs panel látható marad, kompakt és egy sorban elfér */
-    .nav-panel {
-        top: 60px; /* Helyezze feljebb a logó és dolgozói belépés alá */
-        left: 50%; /* Középre igazítás */
-        transform: translateX(-50%); /* Pontos középre igazítás */
-        width: auto; /* Alkalmazkodjon a tartalomhoz */
-        flex-direction: row; /* Vízszintes elrendezés */
-        padding: 8px 10px; /* Még kisebb padding a panel körül */
-        border-radius: 8px;
-        display: flex; /* Győződjünk meg róla, hogy látszik */
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        white-space: nowrap; /* Megakadályozza a törést új sorba */
-    }
-    .nav-panel ul {
-        display: flex; /* Hozza létre a flex konténert a linkeknek */
-        gap: 10px; /* Kisebb távolság a linkek között */
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-    .nav-panel ul li {
-        margin-bottom: 0; /* Nincs függőleges margó */
-    }
-    .nav-panel ul li a {
-        font-size: 0.8em; /* Kisebb betűméret */
-        padding: 5px 8px; /* Kisebb padding a linkeken belül */
-    }
-    .site-footer {
-        padding: 8px 0;
-        font-size: 12px;
-    }
-}
+            .login-box { padding: 25px; width: 95%; }
+            .login-box h2 { font-size: 1.4em; margin-bottom: 15px; }
+            .logo { width: 70px; top: 15px; right: 15px; }
+            .employee-login-box { top: 15px; left: 15px; }
+            .employee-login-box button { font-size: 12px; padding: 7px 10px; }
+            .nav-panel {
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: auto;
+                flex-direction: row;
+                padding: 8px 10px;
+                border-radius: 8px;
+                display: flex;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                white-space: nowrap;
+            }
+            .nav-panel ul { display: flex; gap: 10px; padding: 0; margin: 0; list-style: none; }
+            .nav-panel ul li { margin-bottom: 0; }
+            .nav-panel ul li a { font-size: 0.8em; padding: 5px 8px; }
+            .site-footer { padding: 8px 0; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -357,58 +334,133 @@
     <img src="logo.png" alt="Logo" class="logo">
 
     <div class="login-box glass-effect">
-        <h2>Bejelentkezés a Bank Of MAMA fiókba</h2>
-        <form id="loginForm">
+        <h2 id="form-title">Bejelentkezés</h2>
+        <form id="authForm">
             <input type="text" id="username" placeholder="Felhasználónév" required autocomplete="username"><br>
             <input type="password" id="password" placeholder="Jelszó" required autocomplete="current-password"><br>
-            <button type="submit">Bejelentkezés</button>
-            <div class="error" id="error-msg"></div>
+            <button type="submit" id="submit-btn">Bejelentkezés</button>
+            <div class="error" id="message-box"></div>
         </form>
+        <p class="form-toggle" onclick="toggleForm()">Nincs még fiókod? Regisztrálj!</p>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // Ezt a JavaScript részt a korábbi Flask alkalmazásból vettük át
-        // és itt van most beillesztve a bemutató kedvéért.
-        // Emlékezz, hogy éles környezetben a hitelesítést
-        // és átirányítást szerveroldalon kell kezelni, nem kliensoldalon.
-        const accounts = [
-            { username: 'Máté', password: '12345678', page: 'mate.html' },
-            { username: 'Dani', password: '00000000', page: 'dani.html' },
-            { username: 'Barni', password: '1234', page: 'barni.html' },
-            { username: 'Ádám', password: '2013', page: 'adam.html' },
-            { username: 'Kamilla', password: '0513', page: 'kamilla.html' },
-            { username: 'Mama', password: '0114', page: 'mama.html' },
-            { username: 'admin', password: 'admin1234', page: 'admin.html' }, // Hozzáadva
-            { username: 'Munkás', password: '12345678', page: 'munkas.html' }, // Hozzáadva
-        ];
+        // CSERÉLD LE EZT A SAJÁT FIREBASE KONFIGURÁCIÓDVAL!
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let isLoginMode = true;
+
+        function toggleForm() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('form-title');
+            const button = document.getElementById('submit-btn');
+            const toggleText = document.querySelector('.form-toggle');
+            const messageBox = document.getElementById('message-box');
+
+            if (isLoginMode) {
+                title.textContent = 'Bejelentkezés';
+                button.textContent = 'Bejelentkezés';
+                toggleText.textContent = 'Nincs még fiókod? Regisztrálj!';
+            } else {
+                title.textContent = 'Regisztráció';
+                button.textContent = 'Regisztrálok';
+                toggleText.textContent = 'Van már fiókod? Jelentkezz be!';
+            }
+
+            messageBox.textContent = '';
+            messageBox.className = 'error';
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const inputUser = document.getElementById('username').value.trim();
             const inputPass = document.getElementById('password').value.trim();
-            const errorMsg = document.getElementById('error-msg');
+            const messageBox = document.getElementById('message-box');
             const loginBox = document.querySelector('.login-box');
             const body = document.body;
 
-            errorMsg.textContent = '';
-            errorMsg.classList.remove('error'); // Remove error class to reset animation
+            messageBox.textContent = '';
+            messageBox.className = 'error';
 
-            const match = accounts.find(acc => acc.username === inputUser && acc.password === inputPass);
+            if (!inputUser || !inputPass) {
+                messageBox.textContent = 'A felhasználónév és jelszó mezők nem lehetnek üresek.';
+                return;
+            }
 
-            if (match) {
-                // Start the fade out animation
-                loginBox.classList.add('fade-out');
-                // Apply a temporary solid background color for a smoother transition
-                body.classList.add('fade-bg');
+            if (isLoginMode) {
+                // BEJELENTKEZÉSI LOGIKA
+                db.ref('users/' + inputUser).once('value')
+                    .then(snapshot => {
+                        const userData = snapshot.val();
+                        if (userData && userData.password === inputPass) {
+                            sessionStorage.setItem('loggedInUser', inputUser);
 
-                // Wait for the animation to complete (1s), then redirect
-                setTimeout(() => {
-                    window.location.href = match.page;
-                }, 1000);
+                            loginBox.classList.add('fade-out');
+                            body.classList.add('fade-bg');
+
+                            setTimeout(() => {
+                                window.location.href = 'mate.html'; 
+                            }, 1000);
+                        } else {
+                            messageBox.textContent = 'Hibás felhasználónév vagy jelszó.';
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Firebase login error:", error);
+                        messageBox.textContent = 'Hiba történt a bejelentkezés során. Kérjük, próbálja újra.';
+                    });
             } else {
-                errorMsg.textContent = 'Hibás felhasználónév vagy jelszó.';
-                errorMsg.classList.add('error'); // Add error class for animation
+                // REGISZTRÁCIÓS LOGIKA
+                db.ref('users/' + inputUser).once('value')
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            messageBox.textContent = 'Ez a felhasználónév már foglalt. Kérlek, válassz másikat.';
+                        } else {
+                            // Több Promise-t használunk a két adatbázis-írási művelethez
+                            const userCreationPromise = db.ref('users/' + inputUser).set({
+                                password: inputPass
+                            });
+                            
+                            // Ellenőrzi, hogy van-e már egyenlege a felhasználónak, ha nincs, beállítja az alapértéket
+                            const balanceCreationPromise = db.ref('balances/' + inputUser).once('value')
+                                .then(balanceSnapshot => {
+                                    if (!balanceSnapshot.exists()) {
+                                        return db.ref('balances/' + inputUser).set(5000);
+                                    }
+                                });
+
+                            Promise.all([userCreationPromise, balanceCreationPromise])
+                                .then(() => {
+                                    messageBox.textContent = 'Sikeres regisztráció! Most már bejelentkezhetsz.';
+                                    messageBox.classList.remove('error');
+                                    messageBox.classList.add('success');
+                                    toggleForm();
+                                })
+                                .catch(error => {
+                                    console.error("Firebase registration error:", error);
+                                    messageBox.textContent = 'Hiba történt a regisztráció során.';
+                                });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Firebase database error:", error);
+                        messageBox.textContent = 'Hiba a felhasználónév ellenőrzésekor. Kérjük, próbálja újra.';
+                    });
             }
         });
     </script>

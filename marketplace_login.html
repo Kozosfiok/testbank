@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Of MAMA Marketplace Bejelentkezés</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
+            --primary-blue: #4A90E2;
+            --primary-blue-hover: #357ABD;
+            --text-color-light: #fff;
+            --text-color-dark: #333;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF6F61, #FFD000, #34B96F, #4A90E2, #8A2BE2);
+            background-size: 400% 400%;
+            animation: rainbowBackground 15s ease infinite;
+            overflow: hidden; /* Prevent scrollbars from the animation */
+            position: relative;
+        }
+
+        @keyframes rainbowBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
+
+        .login-box {
+            padding: 40px;
+            text-align: center;
+            width: 350px;
+            max-width: 90%;
+            z-index: 1; /* Ensure it's above the background */
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-box h2 {
+            margin-bottom: 30px;
+            color: var(--text-color-light); /* White text for contrast */
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 2em;
+            text-decoration: none;
+        }
+
+        .login-box input {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color-light); /* White text for input */
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-box input:focus {
+            outline: none; /* Remove default focus outline */
+            border-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 2px var(--primary-blue);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            outline: none; /* Remove default focus outline for button */
+        }
+
+        .login-box button:hover {
+            background-color: var(--primary-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3); /* Slightly larger shadow on hover */
+        }
+        .login-box button:focus {
+            outline: none; /* Ensure no outline on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5); /* Custom focus indication */
+        }
+
+        .error {
+            color: #FFDDDD; /* Light red for errors */
+            background-color: rgba(255, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 14px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        /* Logo Styling */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            height: 60px;
+            z-index: 10;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 500px) {
+            .login-box { padding: 30px; }
+            .login-box h2 { font-size: 1.7em; }
+            .logo { top: 15px; left: 15px; height: 50px; }
+            .back-button { top: 20px; right: 20px; padding: 8px 16px; }
+        }
+
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <img src="logo.png" alt="Logo" class="logo">
+    <a href="mate.html" class="back-button">Vissza a bankhoz</a>
+
+    <div class="login-box glass-effect">
+        <h2>Marketplace Bejelentkezés</h2>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Felhasználónév" required>
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Jelszó" required>
+        </div>
+        <button onclick="login()">Bejelentkezés</button>
+        <div id="error-message" class="error"></div>
+    </div>
+
+    <script>
+        // Ellenőrizze, hogy a felhasználó már be van-e jelentkezve
+        const currentUser = sessionStorage.getItem('loggedInUser');
+        if (currentUser) {
+            window.location.href = 'marketplace_display.html';
+        }
+
+        // CSERÉLD LE EZT A SAJÁT FIREBASE KONFIGURÁCIÓDVAL!
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function showMessage(elementId, text, isError) {
+            const el = document.getElementById(elementId);
+            el.textContent = text;
+            el.className = 'error'; // Use the error class for all messages
+            if (!isError) { // A success message should remove the shake animation
+                 el.style.animation = 'none';
+            }
+            setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        function login() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorMessageEl = document.getElementById("error-message");
+            errorMessageEl.textContent = "";
+
+            if (!username || !password) {
+                errorMessageEl.textContent = "Kérlek, add meg a felhasználónevet és a jelszót.";
+                return;
+            }
+
+            db.ref("users/" + username).once("value", snapshot => {
+                const userData = snapshot.val();
+                if (userData && userData.password === password) {
+                    sessionStorage.setItem('loggedInUser', username);
+                    window.location.href = 'marketplace_display.html';
+                } else {
+                    errorMessageEl.textContent = "Hibás felhasználónév vagy jelszó!";
+                }
+            }).catch(error => {
+                errorMessageEl.textContent = "Hiba a bejelentkezés során: " + error.message;
+            });
+        }
+    </script>
+</body>
+</html>
