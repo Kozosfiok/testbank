@@ -34,9 +34,8 @@
             box-sizing: border-box;
             color: var(--text-color-light);
             position: relative;
-            /* A fő változtatás: engedélyezi a görgetést */
-            **overflow-y: auto;** /* Lehetővé teszi a függőleges görgetést, ha a tartalom túlságosan nagy */
-            **overflow-x: hidden;** /* Elrejti a vízszintes görgetősávot */
+            overflow-y: auto; /* Lehetővé teszi a függőleges görgetést, ha a tartalom túlságosan nagy */
+            overflow-x: hidden; /* Elrejti a vízszintes görgetősávot */
             display: flex;
             flex-direction: column;
             justify-content: flex-start; /* Tartalom felülről indul */
@@ -263,10 +262,71 @@
             background-color: var(--success-color);
         }
 
+        /* Kuponok megjelenítése stílus */
+        .coupon-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-color-dark);
+        }
+
+        .coupon-section h3 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+
+        #userCouponsList {
+            list-style: none;
+            padding: 0;
+            max-height: 200px; /* Fix magasság a görgetéshez */
+            overflow-y: auto; /* Görgetősáv megjelenítése */
+            border: 1px solid rgba(200, 200, 200, 0.5);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            margin-top: 15px;
+        }
+
+        #userCouponsList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(200, 200, 200, 0.3);
+            font-weight: 500;
+            font-size: 0.95em;
+            color: var(--text-color-dark);
+            transition: background-color 0.2s ease;
+        }
+
+        #userCouponsList li:last-child {
+            border-bottom: none;
+        }
+
+        #userCouponsList li:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .use-coupon-btn {
+            background-color: #f44336; /* Red */
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.3s ease;
+        }
+
+        .use-coupon-btn:hover {
+            background-color: #d32f2f; /* Darker red */
+        }
+
+
         .site-footer {
-            /* Változtatás a lábléc pozícióján */
-            **position: relative;** /* Relatív pozíció, hogy a görgetéssel együtt mozogjon */
-            **width: 100%;**
+            position: relative; /* Relatív pozíció, hogy a görgetéssel együtt mozogjon */
+            width: 100%;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -277,7 +337,7 @@
             font-size: 14px;
             z-index: 10;
             box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.25);
-            **margin-top: 40px;** /* Hozzáad egy kis helyet a lábléc és a tartalom közé */
+            margin-top: 40px; /* Hozzáad egy kis helyet a lábléc és a tartalom közé */
         }
 
         .site-footer p {
@@ -370,6 +430,11 @@
     </style>
 </head>
 <body>
+    <!-- Audio elemek a hangok lejátszásához -->
+    <audio id="notificationSound" src="notification.mp3" preload="auto"></audio>
+    <audio id="successSound" src="success.mp3" preload="auto"></audio>
+    <audio id="notSuccessSound" src="not_success.mp3" preload="auto"></audio>
+
     <img src="logo.png" alt="Logo" class="logo" />
     <div class="logout-box glass-effect">
         <button onclick="window.location.href='login_employee.html'">Kijelentkezés</button>
@@ -408,7 +473,18 @@
         <button onclick="submitCash()">Beküldés</button>
         <div id="message"></div>
         <button onclick="resetForm()" style="margin-top:10px;">Új beolvasás</button>
+
+        <div class="coupon-section">
+            <h3>Aktív Kuponok</h3>
+            <ul id="userCouponsList">
+                <!-- Kuponok ide töltődnek be dinamikusan -->
+            </ul>
+        </div>
     </div>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -436,12 +512,23 @@
         const amountInput = document.getElementById("amount");
         const couponSelect = document.getElementById("couponSelect");
         const messageDiv = document.getElementById("message");
+        const userCouponsList = document.getElementById("userCouponsList");
+
+        // Audio elemek referenciái
+        const notificationSound = document.getElementById("notificationSound");
+        const successSound = document.getElementById("successSound");
+        const notSuccessSound = document.getElementById("notSuccessSound");
 
         let scanning = false;
         let scannedUser = null;
 
+        // Lejátsz egy hangot
+        function playSound(audioElement) {
+            audioElement.currentTime = 0; // Visszaállítja a hangot az elejére, ha már játszott
+            audioElement.play().catch(error => console.warn("Audio lejátszási hiba:", error));
+        }
+
         function startCamera() {
-            // Check if there are any video tracks active before attempting to stop
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
             }
@@ -486,24 +573,29 @@
                 });
 
                 if (code) {
+                    playSound(notificationSound); // Lejátsza a beolvasás hangot
                     const candidateUser = code.data.trim();
-                    db.ref("balances/" + candidateUser).get().then(snapshot => {
+                    db.ref("users/" + candidateUser).once("value").then(snapshot => { // Ellenőrizzük a 'users' node-ban
                         if (snapshot.exists()) {
                             scannedUser = candidateUser;
                             output.textContent = `Beolvasott név: ${scannedUser}`;
                             scanning = false;
                             video.srcObject.getTracks().forEach(track => track.stop()); // Stop camera
+                            playSound(successSound); // Sikeres hang
                             showInputForm(scannedUser);
+                            fetchUserCoupons(scannedUser); // Kuponok betöltése
                         } else {
+                            playSound(notSuccessSound); // Sikertelen hang
                             output.textContent = `Nincs ilyen fiók: ${candidateUser}`;
                             setTimeout(() => {
                                 output.textContent = "QR kód beolvasása...";
-                                if (scanning) { // Only continue scanning if still in scanning mode
+                                if (scanning) { 
                                     requestAnimationFrame(scanFrame);
                                 }
                             }, 3000);
                         }
                     }).catch(err => {
+                        playSound(notSuccessSound); // Sikertelen hang
                         output.textContent = "Hiba történt a fiók ellenőrzésekor: " + err.message;
                         console.error("Firebase fetch error: ", err);
                     });
@@ -524,80 +616,202 @@
             messageDiv.className = "";
         }
 
+        function recordTransaction(sender, receiver, amount, description) {
+            const transactionsRef = db.ref('transactions');
+            const newTransactionRef = transactionsRef.push();
+            newTransactionRef.set({
+                timestamp: new Date().toISOString(),
+                sender: sender,
+                receiver: receiver,
+                amount: amount,
+                description: description
+            })
+            .then(() => { console.log("Tranzakció sikeresen rögzítve."); })
+            .catch((error) => { console.error("Hiba a tranzakció rögzítésekor: ", error); });
+        }
+
         function submitCash() {
             const amount = parseInt(amountInput.value);
             const coupon = couponSelect.value;
             const operation = document.querySelector('input[name="operation"]:checked').value;
 
-            if ((isNaN(amount) || amount <= 0) && coupon === "") { /* Changed amount >= 0 to amount <= 0 */
+            if ((isNaN(amount) || amount <= 0) && coupon === "") {
                 messageDiv.textContent = "Adj meg pozitív összeget vagy válassz kupont!";
                 messageDiv.className = "error";
                 return;
             }
 
             const updates = {};
+            let balanceUpdatePromise = Promise.resolve(); // Promise for balance update
 
-            db.ref("balances/" + scannedUser).once("value").then(snapshot => {
-                let currentBalance = snapshot.val() || 0;
-
-                if (!isNaN(amount) && amount > 0) {
-                    let newBalance = currentBalance;
-
+            if (!isNaN(amount) && amount > 0) {
+                balanceUpdatePromise = db.ref("balances/" + scannedUser).transaction(currentBalance => {
+                    let newBalance = currentBalance || 0;
                     if (operation === "add") {
                         newBalance += amount;
                     } else if (operation === "subtract") {
-                        if (currentBalance < amount) {
-                            throw new Error("Nincs elég keksz az egyenlegen.");
+                        if (currentBalance === null || currentBalance < amount) {
+                            messageDiv.textContent = "Nincs elég keksz az egyenlegen.";
+                            messageDiv.className = "error";
+                            return undefined; // Abort transaction
                         }
                         newBalance -= amount;
                     }
-                    updates["balances/" + scannedUser] = newBalance;
-                }
+                    return newBalance;
+                });
+            }
 
-                if (coupon !== "") {
-                    // Check if coupon already exists for the user
-                    return db.ref("coupons/" + scannedUser + "/" + coupon).once("value").then(couponSnapshot => {
-                        if (couponSnapshot.exists() && couponSnapshot.val() === true) {
-                            throw new Error("Ez a kupon már hozzá van rendelve ehhez a felhasználóhoz.");
+            balanceUpdatePromise
+                .then(balanceResult => {
+                    if (balanceResult && !balanceResult.committed) {
+                        return; // Transaction aborted due to insufficient funds (message already set)
+                    }
+
+                    if (coupon !== "") {
+                        return db.ref("coupons/" + scannedUser + "/" + coupon).once("value").then(couponSnapshot => {
+                            if (couponSnapshot.exists() && couponSnapshot.val() === true) {
+                                messageDiv.textContent = "Ez a kupon már hozzá van rendelve ehhez a felhasználóhoz.";
+                                messageDiv.className = "error";
+                                return; // Kupon már létezik
+                            }
+                            updates["coupons/" + scannedUser + "/" + coupon] = true;
+                            
+                            if (coupon === "1000KEKSZ") {
+                                // Megjegyzés: Az 1000KEKSZ levonásának tranzakcióját itt rögzítjük
+                                // Mivel ez egy dolgozói oldal, feltételezzük, hogy az egyenleg update
+                                // itt történik, de az "felhasználom" gombnak kellene levennie az 1000 kekszet a mate.html-ben
+                                // Itt csak a kupon hozzáadása történik, és a tranzakció rögzítése a hozzáadásról.
+                                // Az actual levonás a mate.html oldalon van, a felhasználó "Felhasználom" gombjával.
+                                // recordTransaction('Rendszer', scannedUser, -1000, 'Kupon hozzáadva: 1000KEKSZ'); // EZT NE ITT LEJÁTSZANI, csak a kupon rögzítése
+                            }
+                            return db.ref().update(updates);
+                        });
+                    } else {
+                        // Ha nincs kupon, de volt egyenleg frissítés, akkor rögzítjük a tranzakciót
+                        if (!isNaN(amount) && amount > 0) {
+                             const description = (operation === "add" ? "Keksz hozzáadva" : "Keksz levonva") + `: ${amount} Ft`;
+                             recordTransaction('Dolgozó', scannedUser, (operation === "add" ? amount : -amount), description);
                         }
-                        updates["coupons/" + scannedUser + "/" + coupon] = true;
-                        return db.ref().update(updates);
-                    });
+                        return Promise.resolve(); // Nincs további adatbázis művelet
+                    }
+                })
+                .then(() => {
+                    if (messageDiv.className !== "error") { // Csak akkor írjuk ki a sikeres üzenetet, ha nem volt hiba
+                        messageDiv.textContent = "Sikeres mentés!";
+                        messageDiv.className = "success";
+                        setTimeout(() => {
+                            resetForm();
+                        }, 2000);
+                        fetchUserCoupons(scannedUser); // Kuponok frissítése sikeres mentés után
+                    }
+                })
+                .catch(err => {
+                    messageDiv.textContent = "Hiba: " + err.message;
+                    messageDiv.className = "error";
+                    console.error("Hiba a mentés során:", err);
+                });
+        }
+
+
+        // Kuponok kezelése
+        const couponMapping = {
+            "1000KEKSZ": "1000 keksz levonása",
+            "FILMV": "Filmválasztás",
+            "JATEK": "Te választod a játékot",
+            "HOLALSZ": "Hol alszol",
+            "KIVELALSZ": "Kivel alszol",
+            "EBED": "Ebédválasztás",
+            "JATSZOTER": "Játszótér"
+        };
+
+        function fetchUserCoupons(username) {
+            userCouponsList.innerHTML = ''; // Töröljük a korábbi kuponokat
+            // A valós idejű frissítéshez 'on' helyett 'once'-ot használhatunk, ha csak egyszer akarjuk lekérni, vagy
+            // az 'on' listener maradjon, ha azt akarjuk, hogy automatikusan frissüljön
+            db.ref("coupons/" + username).on("value", snapshot => { 
+                userCouponsList.innerHTML = ''; // Töröljük újra a listát minden frissítésnél
+                const coupons = snapshot.val();
+                if (!coupons) {
+                    userCouponsList.innerHTML = '<li>Nincsenek aktív kuponjai.</li>';
+                    return;
                 }
-                return db.ref().update(updates); // If only amount is updated
-            }).then(() => {
-                messageDiv.textContent = "Sikeres mentés!";
-                messageDiv.className = "success";
-                setTimeout(() => {
-                    resetForm();
-                }, 2000);
-            }).catch(err => {
-                messageDiv.textContent = "Hiba: " + err.message;
-                messageDiv.className = "error";
+                Object.keys(coupons).forEach(couponCode => {
+                    if (coupons[couponCode] === true && couponMapping[couponCode]) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span>${couponMapping[couponCode]}</span>
+                            <button class="use-coupon-btn" data-coupon-code="${couponCode}" onclick="useCoupon('${couponCode}')">Felhasználom</button>
+                        `;
+                        userCouponsList.appendChild(li);
+                    }
+                });
             });
         }
+
+        async function useCoupon(code) {
+            try {
+                // Kupon eltávolítása az adatbázisból
+                await db.ref("coupons/" + scannedUser + "/" + code).remove();
+                
+                let transactionAmount = 0;
+                let transactionDescription = `Kupon felhasználva: ${couponMapping[code]}`;
+
+                if (code === "1000KEKSZ") {
+                    // Itt történik a keksz levonása a felhasználó egyenlegéből
+                    const balanceRef = db.ref("balances/" + scannedUser);
+                    const transactionResult = await balanceRef.transaction(currentBalance => {
+                        transactionAmount = -1000;
+                        transactionDescription += " (-1000 keksz)";
+                        return Math.max(0, (currentBalance || 0) - 1000);
+                    });
+
+                    if (transactionResult.committed) {
+                        messageDiv.textContent = `Kupon sikeresen felhasználva: ${couponMapping[code]}!`;
+                        messageDiv.className = "success";
+                        playSound(successSound);
+                    } else if (transactionResult.error) {
+                        messageDiv.textContent = `Hiba a keksz levonásakor: ${transactionResult.error.message}`;
+                        messageDiv.className = "error";
+                        playSound(notSuccessSound);
+                        console.error("Keksz levonási hiba:", transactionResult.error);
+                        // Fontos: Ha a tranzakció sikertelen, visszaállíthatjuk a kupont.
+                        // Ez megakadályozza, hogy egy kupon eltűnjön, ha nem sikerült levonni a kekszet.
+                        await db.ref("coupons/" + scannedUser + "/" + code).set(true); 
+                    }
+                } else {
+                    messageDiv.textContent = `Kupon sikeresen felhasználva: ${couponMapping[code]}!`;
+                    messageDiv.className = "success";
+                    playSound(successSound);
+                }
+                
+                recordTransaction('Dolgozó', scannedUser, transactionAmount, transactionDescription);
+                // fetchUserCoupons(scannedUser); // Az .on("value") listener miatt frissül automatikusan
+
+            } catch (error) {
+                console.error("Hiba a kupon felhasználásakor:", error);
+                messageDiv.textContent = `Hiba a kupon felhasználásakor: ${error.message}`;
+                messageDiv.className = "error";
+                playSound(notSuccessSound);
+            }
+        }
+
 
         function resetForm() {
             inputForm.style.display = "none";
             output.textContent = "QR kód beolvasása...";
             scannedUser = null;
-            // Clear input values
             amountInput.value = "";
             couponSelect.value = "";
-            document.getElementById('add').checked = true; // Reset radio button
+            document.getElementById('add').checked = true;
             messageDiv.textContent = "";
             messageDiv.className = "";
-
-            startCamera(); // Restart camera only after everything is reset
+            userCouponsList.innerHTML = ''; // Töröljük a kuponlistát
+            startCamera();
         }
 
         window.onload = () => {
             startCamera();
         };
     </script>
-
-    <footer class="site-footer">
-        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
-    </footer>
 </body>
 </html>
