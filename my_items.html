@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saját Termékeim - Bank of Mama</title>
+    <link rel="icon" href="logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a82fb;
+            --secondary-color: #fc5c7d;
+            --accent-color: #ffc847;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #1a2238;
+            --header-height: 80px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            margin: 0;
+            padding-top: calc(var(--header-height) + 30px);
+            padding-bottom: 90px;
+            color: var(--text-color);
+            background: linear-gradient(45deg, #6a82fb, #fc5c7d, #ffc847, #54e2d2);
+            background-size: 400% 400%;
+            animation: gradient-flow 20s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .menu-toggle {
+            width: 30px;
+            height: 22px;
+            position: relative;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1002;
+        }
+        .menu-toggle span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 3px;
+            left: 0;
+            transition: all 0.35s ease-in-out;
+        }
+        .menu-toggle span:nth-child(1) { top: 0px; }
+        .menu-toggle span:nth-child(2) { top: 9px; }
+        .menu-toggle span:nth-child(3) { top: 18px; }
+
+        .menu-toggle.active span:nth-child(1) { top: 9px; transform: rotate(135deg); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+        .menu-toggle.active span:nth-child(3) { top: 9px; transform: rotate(-135deg); }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding-top: 120px;
+            text-align: left;
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+        .nav-menu.active {
+            transform: translateX(0);
+        }
+        .nav-menu a {
+            display: block;
+            padding: 20px 35px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            opacity: 0; /* Initially hidden for stagger */
+            transform: translateY(20px); /* Initially shifted for stagger */
+        }
+        .nav-menu.active a {
+            opacity: 1; /* Fade in */
+            transform: translateY(0); /* Move to final position */
+        }
+        .nav-menu.active a:nth-child(1) { transition-delay: 0.1s; }
+        .nav-menu.active a:nth-child(2) { transition-delay: 0.15s; }
+        .nav-menu.active a:nth-child(3) { transition-delay: 0.2s; }
+        .nav-menu.active a:nth-child(4) { transition-delay: 0.25s; } /* New link for my_items.html */
+        .nav-menu.active a:nth-child(5) { transition-delay: 0.3s; }
+        .nav-menu.active a:nth-child(6) { transition-delay: 0.35s; }
+
+
+        .nav-menu a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateX(10px);
+        }
+        
+        #page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        #page-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px 45px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+            border: 1px solid var(--glass-border);
+            max-width: 1000px; /* Increased max-width for products */
+            width: 90%;
+            margin: 20px auto;
+            box-sizing: border-box;
+            animation: card-enter 0.8s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        h1 { font-size: 2.3em; margin-bottom: 10px; }
+        hr { border: none; border-top: 1px solid var(--glass-border); margin: 35px 0;}
+
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .site-footer a { color: white; text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        /* Products Grid */
+        #myProductsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+            gap: 25px;
+            padding: 20px 0;
+            justify-content: center; /* Center items in the grid */
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            overflow: hidden; /* Ensure content doesn't spill */
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px; /* Fixed height for images */
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background-color: #e0e0e0; /* Placeholder background */
+        }
+
+        .product-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            word-break: break-word; /* Break long words */
+        }
+
+        .product-card p {
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            flex-grow: 1; /* Allow description to take available space */
+            word-break: break-word;
+        }
+
+        .product-card .price {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .product-card .seller {
+            font-size: 0.85em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .product-card .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        .product-card button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 120px; /* Minimum width for buttons */
+        }
+
+        .product-card button:hover {
+            background-color: var(--primary-color-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .product-card button.delete-btn {
+            background-color: #d32f2f; /* Red for delete */
+        }
+        .product-card button.delete-btn:hover {
+            background-color: #c62828;
+        }
+
+        .message-box {
+            background-color: #f0f0f0;
+            color: var(--text-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+
+        .message-box.error {
+            background-color: #ffe0e0;
+            color: #d32f2f;
+        }
+
+        .message-box.success {
+            background-color: #e0ffe0;
+            color: #2e7d32;
+        }
+
+        #loadingProductsMsg {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        #loadingProductsMsg.error {
+            color: #d32f2f;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div id="page-overlay" onclick="toggleMenu()"></div>
+
+    <header class="header">
+        <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+    </header>
+
+    <nav class="nav-menu" id="navMenu">
+        <a href="mate.html">Főoldal</a>
+        <a href="transactions.html">Tranzakciók</a>
+        <a href="marketplace_display.html">Piactér</a>
+        <a href="my_items.html">Saját termékeim</a> <!-- New menu item -->
+        <a href="about.html">Rólunk</a>
+        <a href="login.html">Kijelentkezés</a>
+    </nav>
+
+    <main class="card">
+        <h1 id="pageTitle">Saját Termékeim</h1>
+        <hr />
+
+        <div id="message" class="message-box"></div>
+        <p id="loadingProductsMsg">Termékek betöltése...</p>
+        <div id="myProductsContainer">
+            <!-- Termékek ide töltődnek be dinamikusan -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Mama Technologies • Szponzorunk: <a href="https://sites.google.com/view/parkliga" target="_blank">Parkliga</a></p>
+    </footer>
+
+    <script>
+        // === Animált Menü Működése ===
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("active");
+            document.getElementById("menuToggle").classList.toggle("active");
+            document.getElementById("page-overlay").classList.toggle("active");
+        }
+        
+        // Firebase Konfiguráció
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9VC5qOYt97Rt-3EMmJzBFzuIdrJas0lA",
+            authDomain: "jatekbank-89289.firebaseapp.com",
+            databaseURL: "https://jatekbank-89289-default-rtdb.firebaseio.com",
+            projectId: "jatekbank-89289",
+            storageBucket: "jatekbank-89289.firebasestorage.app",
+            messagingSenderId: "77741361269",
+            appId: "1:77741361269:web:e1226bc616d9e845d9903c",
+            measurementId: "G-B76FVR2187"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Felhasználó lekérdezése sessionStorage-ból (az eddigi logikák alapján)
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        const pageTitle = document.getElementById('pageTitle');
+        const myProductsContainer = document.getElementById('myProductsContainer');
+        const loadingProductsMsg = document.getElementById('loadingProductsMsg');
+        const messageDiv = document.getElementById('message');
+
+        // Átirányítás, ha nincs bejelentkezett felhasználó
+        if (!loggedInUser) {
+            pageTitle.textContent = "Kérjük, jelentkezzen be a termékek megtekintéséhez!";
+            // Egyedi üzenet megjelenítése átirányítás előtt
+            messageDiv.textContent = "Nincs bejelentkezett felhasználó. Kérjük, jelentkezzen be!";
+            messageDiv.className = 'message-box error';
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000); // 2 másodperc után átirányít
+            // Leállítjuk a további kód futását, mivel nincs bejelentkezett felhasználó
+            throw new Error("No logged in user, redirecting."); 
+        } else {
+            pageTitle.textContent = `${loggedInUser} Saját Termékei`;
+        }
+
+        // --- Üzenet megjelenítése (pop-up helyett) ---
+        function showMessage(msg, isError = false) {
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message-box ' + (isError ? 'error' : 'success');
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000); // 3 másodperc után eltűnik
+        }
+
+        /**
+         * Rögzít egy tranzakciót a Firebase adatbázisban.
+         * Ez a helper függvény segíti a tranzakciók egységes rögzítését.
+         * @param {string} sender - A tranzakció feladója.
+         * @param {string} receiver - A tranzakció címzettje.
+         * @param {number} amount - A tranzakció összege (pozitív, vagy negatív).
+         * @param {string} description - A tranzakció leírása.
+         * @param {string} type - A tranzakció típusa (pl. 'add', 'subtract', 'coupon', 'bill', 'transfer', 'purchase', 'resell', 'delete_item', 'sale').
+         * @param {string} [productName=''] - Opcionális terméknév, ha releváns.
+         */
+        function recordTransaction(sender, receiver, amount, description, type, productName = '') {
+            const transactionsRef = db.ref('transactions');
+            const newTransactionRef = transactionsRef.push();
+            
+            // Dátum formázása a bizonylathoz (bár most nem használjuk, de jó, ha konzisztens)
+            const timestamp = new Date().toLocaleString('hu-HU', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            // Bizonylat tartalmának generálása (akkor is, ha nem használjuk, a Firebase-ben jó ha van)
+            let receiptOperationText = "";
+            let receiptDescription = description;
+            let receiptAmountFormatted = `${amount.toLocaleString('hu-HU')} Ft`;
+
+            switch (type) {
+                case 'purchase':
+                    receiptOperationText = "VÁSÁRLÁS BIZONYLAT";
+                    receiptDescription = `${sender} vásárolta a(z) "${productName}" terméket ${receiver}től. Leírás: ${description}`;
+                    break;
+                case 'sale':
+                    receiptOperationText = "ELADÁS BIZONYLAT";
+                    receiptDescription = `${sender} eladta a(z) "${productName}" terméket ${receiver}nek. Leírás: ${description}`;
+                    break;
+                case 'resell':
+                    receiptOperationText = "ÚJRAÉRTÉKESÍTÉS BIZONYLAT";
+                    receiptDescription = `${sender} újraértékesíti a(z) "${productName}" terméket. Leírás: ${description}`;
+                    receiptAmountFormatted = `0 Ft`; // Nincs közvetlen pénzmozgás, csak "előkészítés"
+                    break;
+                case 'delete_item':
+                    receiptOperationText = "TERMÉK TÖRLÉSE BIZONYLAT";
+                    receiptDescription = `${sender} törölte a(z) "${productName}" terméket a készletéből. Leírás: ${description}`;
+                    receiptAmountFormatted = `0 Ft`;
+                    break;
+                // ... más tranzakciótípusok kezelése
+                default:
+                    receiptOperationText = "TRANZAKCIÓ BIZONYLAT";
+            }
+
+            const receiptContent = `
+=== BANK OF MAMA - ${receiptOperationText} ===
+
+Dátum és idő: ${timestamp}
+Tranzakció azonosító: ${newTransactionRef.key}
+
+Feladó: ${sender}
+Címzett: ${receiver}
+Összeg: ${receiptAmountFormatted}
+
+Leírás: ${receiptDescription}
+
+---------------------------------------
+Köszönjük a tranzakciót!
+Bank of MAMA
+`;
+
+            newTransactionRef.set({
+                timestamp: new Date().toISOString(),
+                sender: sender,
+                receiver: receiver,
+                amount: amount, // The original signed amount
+                description: description,
+                receiptContent: receiptContent,
+                type: type, // Store the transaction type
+                productName: productName // Store product name for easy filtering/display
+            })
+            .then(() => { console.log(`Tranzakció sikeresen rögzítve (${type}).`); })
+            .catch((error) => { console.error(`Hiba a tranzakció rögzítésekor (${type}): `, error); });
+        }
+
+
+        // --- Termékek betöltése és megjelenítése ---
+        function displayMyProducts() {
+            // Ha nincs bejelentkezett felhasználó, ne próbáljuk meg lekérdezni a termékeket
+            if (!loggedInUser) {
+                myProductsContainer.innerHTML = '';
+                loadingProductsMsg.textContent = "Kérjük, jelentkezzen be a termékei megtekintéséhez.";
+                loadingProductsMsg.classList.remove('hidden'); // Ensure it's visible
+                loadingProductsMsg.classList.remove('error'); // Clear any error class
+                return;
+            }
+
+            loadingProductsMsg.textContent = "Termékek betöltése...";
+            loadingProductsMsg.classList.remove('hidden', 'error');
+            myProductsContainer.innerHTML = ''; // Clear previous products
+
+            const productsRef = db.ref('marketplace/products');
+
+            productsRef.on('value', (snapshot) => {
+                myProductsContainer.innerHTML = ''; // Clear for fresh load
+                const products = [];
+                snapshot.forEach(childSnapshot => {
+                    const product = childSnapshot.val();
+                    // Csak a bejelentkezett felhasználó tulajdonában lévő, és NEM törölt termékeket mutatjuk
+                    // A feltöltött `marketplace_display.html` alapján a `buyer` mező rögzíti a tulajdonost.
+                    if (product.buyer === loggedInUser && !(product.deleted === true)) {
+                        products.push(product);
+                    }
+                });
+
+                if (products.length === 0) {
+                    loadingProductsMsg.textContent = "Még nincsenek megvásárolt termékeid.";
+                    loadingProductsMsg.classList.remove('hidden', 'error');
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.setAttribute('data-product-id', product.id);
+
+                    // Placeholder image if imageUrl is missing or invalid
+                    const imageUrl = product.imageUrl || `https://placehold.co/400x250/cccccc/333333?text=${encodeURIComponent(product.name)}`;
+
+                    productCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Nincs+k\u00E9p';">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <div class="price">${product.price.toLocaleString('hu-HU')} Ft</div>
+                        <div class="seller">Eredeti eladó: ${product.seller}</div>
+                        <div class="actions">
+                            <button onclick="offerForResale('${product.id}', '${product.name}', ${product.price})">Újraértékesítés</button>
+                            <button class="delete-btn" onclick="deleteItem('${product.id}', '${product.name}')">Törlés a készletből</button>
+                        </div>
+                    `;
+                    myProductsContainer.appendChild(productCard);
+                });
+
+                loadingProductsMsg.classList.add('hidden'); // Hide loading message
+            }, (error) => {
+                console.error("Hiba a termékek lekérdezésekor:", error);
+                loadingProductsMsg.textContent = "Hiba a termékek betöltésekor.";
+                loadingProductsMsg.classList.add('error');
+            });
+        }
+
+        // --- Újraértékesítés funkció ---
+        async function offerForResale(productId, productName, productPrice) {
+            // Custom modal for confirmation (replacing alert/confirm)
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
+            confirmModal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-4">
+                    <p class="text-xl font-semibold mb-6">Biztosan újraértékesítésre kínálod a(z) <span class="text-blue-600">"${productName}"</span> terméket <br><span class="text-blue-600">${productPrice.toLocaleString('hu-HU')} Ft</span> áron? Ezzel újra megjelenik a piactéren.</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="confirmResaleBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Igen</button>
+                        <button id="cancelResaleBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Mégsem</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+
+            document.getElementById('confirmResaleBtn').onclick = async () => {
+                document.body.removeChild(confirmModal);
+                try {
+                    const productRef = db.ref(`marketplace/products/${productId}`);
+                    await productRef.update({
+                        isSold: false, // Nem eladott, elérhető újra
+                        buyer: null,   // Nincs konkrét vásárlója, újra eladó
+                        seller: loggedInUser, // Az aktuális felhasználó az új eladó
+                        saleDate: null // Töröljük az előző eladás dátumát
+                    });
+
+                    showMessage(`A(z) "${productName}" termék sikeresen újraértékesítésre kínálva!`, false);
+                    recordTransaction(loggedInUser, 'Piactér', 0, `Termék újraértékesítése: "${productName}"`, 'resell', productName);
+                    // displayMyProducts() will be called automatically by the 'value' listener on productsRef
+                } catch (error) {
+                    console.error("Hiba az újraértékesítés során:", error);
+                    showMessage(`Hiba az újraértékesítés során: ${error.message}`, true);
+                }
+            };
+            document.getElementById('cancelResaleBtn').onclick = () => {
+                document.body.removeChild(confirmModal);
+                showMessage("Újraértékesítés megszakítva.", true);
+            };
+        }
+
+        // --- Törlés a készletből funkció ---
+        async function deleteItem(productId, productName) {
+            // Custom modal for confirmation (replacing alert/confirm)
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
+            confirmModal.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-4">
+                    <p class="text-xl font-semibold mb-6">Biztosan törölni szeretnéd a(z) <span class="text-red-600">"${productName}"</span> terméket a készletedből?</p>
+                    <p class="text-md text-gray-700 mb-6">Ezt a műveletet nem lehet visszavonni, a termék végleg eltűnik.</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Igen, törlöm</button>
+                        <button id="cancelDeleteBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Mégsem</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+
+            document.getElementById('confirmDeleteBtn').onclick = async () => {
+                document.body.removeChild(confirmModal);
+                try {
+                    const productRef = db.ref(`marketplace/products/${productId}`);
+                    // A terméket logikailag "töröljük", nem fizikai törléssel
+                    await productRef.update({
+                        deleted: true, // Megjelöljük töröltként
+                        buyer: null,   // Már nincs vásárlója/tulajdonosa
+                        seller: null,  // Már nincs eladója
+                        isSold: true   // Technikailag "eladott", de a `deleted` felülírja a jelentőségét
+                    });
+
+                    showMessage(`A(z) "${productName}" termék sikeresen törölve a készletből.`, false);
+                    recordTransaction(loggedInUser, 'Rendszer', 0, `Termék törölve a készletből: "${productName}"`, 'delete_item', productName);
+                    // displayMyProducts() will be called automatically by the 'value' listener on productsRef
+                } catch (error) {
+                    console.error("Hiba a törlés során:", error);
+                    showMessage(`Hiba a törlés során: ${error.message}`, true);
+                }
+            };
+            document.getElementById('cancelDeleteBtn').onclick = () => {
+                document.body.removeChild(confirmModal);
+                showMessage("Termék törlése megszakítva.", true);
+            };
+        }
+
+        // Oldal betöltésekor
+        document.addEventListener('DOMContentLoaded', displayMyProducts);
+    </script>
+</body>
+</html>

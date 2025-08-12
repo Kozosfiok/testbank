@@ -330,7 +330,7 @@
     </header>
 
     <main class="card">
-        <h1>Marketplace</h1>
+        <h1>Mama Bank Piactér</h1>
         <p class="text-xl">Jelenlegi egyenleged: <strong id="balance" class="text-blue-800">Betöltés...</strong></p>
         <p id="message" class="message"></p>
 
@@ -344,6 +344,7 @@
         <div class="button-group">
             <a href="marketplace_upload.html" class="primary-button">Termék feltöltése</a>
             <a href="mate.html" class="primary-button">Vissza a főoldalra</a>
+            <a href="my_items.html" class="primary-button">Saját termékeim</a> <!-- ÚJ GOMB -->
         </div>
     </main>
 
@@ -353,13 +354,20 @@
 
     <script>
         // Ellenőrzi, hogy a felhasználó be van-e jelentkezve, ha nem, átirányít
-        const currentUser = sessionStorage.getItem('loggedInUser');
+        const currentUser = sessionStorage.getItem('loggedInUser'); // Ahogy a login.html és mate.html használja
         if (!currentUser) {
-            window.location.href = 'login.html';
+            // alert('Nincs bejelentkezett felhasználó. Kérjük, jelentkezzen be!'); // Use custom modal instead
+            messageEl.textContent = 'Nincs bejelentkezett felhasználó. Kérjük, jelentkezzen be!';
+            messageEl.className = 'message error';
+            messageEl.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+            
+        } else {
+            // Üdvözlő üzenet beállítása
+            document.getElementById('userGreeting').textContent = `Üdv, ${currentUser}!`;
         }
-
-        // Üdvözlő üzenet beállítása
-        document.getElementById('userGreeting').textContent = `Üdv, ${currentUser}!`;
 
         // Kijelentkezés funkció
         function logout() {
@@ -391,49 +399,121 @@
         function showMessage(text, isError) {
             messageEl.textContent = text;
             messageEl.className = 'message ' + (isError ? 'error' : 'success');
-            setTimeout(() => { messageEl.textContent = '', messageEl.classList.remove('error', 'success'); }, 5000);
+            // Biztosítjuk, hogy az üzenetdoboz látható legyen
+            messageEl.style.display = 'block'; 
+            setTimeout(() => { 
+                messageEl.textContent = ''; 
+                messageEl.classList.remove('error', 'success'); 
+                messageEl.style.display = 'none'; // Elrejtjük az üzenetet idő után
+            }, 5000);
         }
 
         // Egyenleg kijelzésének frissítése
         function updateBalanceDisplay() {
+            if (!currentUser) return; // Ne próbáljon egyenleget lekérdezni, ha nincs bejelentkezve
             db.ref("balances/" + currentUser).on("value", snap => {
                 const value = snap.val() || 0;
                 document.getElementById("balance").textContent = value.toLocaleString('hu-HU') + " Ft";
             });
         }
 
-        // Tranzakció rögzítése a Firebase-ben
-        function recordTransaction(sender, receiver, amount, description) {
+        /**
+         * Rögzít egy tranzakciót a Firebase adatbázisban.
+         * Ez a helper függvény segíti a tranzakciók egységes rögzítését.
+         * @param {string} sender - A tranzakció feladója.
+         * @param {string} receiver - A tranzakció címzettje.
+         * @param {number} amount - A tranzakció összege (pozitív, vagy negatív).
+         * @param {string} description - A tranzakció leírása.
+         * @param {string} type - A tranzakció típusa (pl. 'add', 'subtract', 'coupon', 'bill', 'transfer', 'purchase', 'resell', 'delete_item', 'sale').
+         * @param {string} [productName=''] - Opcionális terméknév, ha releváns.
+         */
+        function recordTransaction(sender, receiver, amount, description, type, productName = '') {
             const transactionsRef = db.ref('transactions');
-            const newTransactionRef = transactionsRef.push(); 
+            const newTransactionRef = transactionsRef.push();
+            
+            // Dátum formázása a bizonylathoz (bár most nem használjuk, de jó, ha konzisztens)
+            const timestamp = new Date().toLocaleString('hu-HU', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            // Bizonylat tartalmának generálása (akkor is, ha nem használjuk, a Firebase-ben jó ha van)
+            let receiptOperationText = "";
+            let receiptDescription = description;
+            let receiptAmountFormatted = `${amount.toLocaleString('hu-HU')} Ft`;
+
+            switch (type) {
+                case 'purchase':
+                    receiptOperationText = "VÁSÁRLÁS BIZONYLAT";
+                    receiptDescription = `${sender} vásárolta a(z) "${productName}" terméket ${receiver}től. Leírás: ${description}`;
+                    break;
+                case 'sale': // Új típus az eladásokhoz
+                    receiptOperationText = "ELADÁS BIZONYLAT";
+                    receiptDescription = `${sender} eladta a(z) "${productName}" terméket ${receiver}nek. Leírás: ${description}`;
+                    break;
+                case 'resell':
+                    receiptOperationText = "ÚJRAÉRTÉKESÍTÉS BIZONYLAT";
+                    receiptDescription = `${sender} újraértékesíti a(z) "${productName}" terméket. Leírás: ${description}`;
+                    receiptAmountFormatted = `0 Ft`; // Nincs közvetlen pénzmozgás, csak "előkészítés"
+                    break;
+                case 'delete_item':
+                    receiptOperationText = "TERMÉK TÖRLÉSE BIZONYLAT";
+                    receiptDescription = `${sender} törölte a(z) "${productName}" terméket a készletéből. Leírás: ${description}`;
+                    receiptAmountFormatted = `0 Ft`;
+                    break;
+                default:
+                    receiptOperationText = "TRANZAKCIÓ BIZONYLAT";
+            }
+
+            const receiptContent = `
+=== BANK OF MAMA - ${receiptOperationText} ===
+
+Dátum és idő: ${timestamp}
+Tranzakció azonosító: ${newTransactionRef.key}
+
+Feladó: ${sender}
+Címzett: ${receiver}
+Összeg: ${receiptAmountFormatted}
+
+Leírás: ${receiptDescription}
+
+---------------------------------------
+Köszönjük a tranzakciót!
+Bank of MAMA
+`;
 
             newTransactionRef.set({
                 timestamp: new Date().toISOString(),
                 sender: sender,
                 receiver: receiver,
-                amount: amount,
-                description: description
+                amount: amount, // The original signed amount
+                description: description,
+                receiptContent: receiptContent,
+                type: type, // Store the transaction type
+                productName: productName // Store product name for easy filtering/display
             })
-            .catch((error) => {
-                console.error("Hiba a tranzakció rögzítésekor: ", error);
-            });
+            .then(() => { console.log(`Tranzakció sikeresen rögzítve (${type}).`); })
+            .catch((error) => { console.error(`Hiba a tranzakció rögzítésekor (${type}): `, error); });
         }
+
 
         // Termékek lekérése és megjelenítése
         function fetchProducts() {
-            productsContainer.innerHTML = ''; 
-            loadingProductsMsg.classList.remove('hidden');
-            noProductsMessage.classList.add('hidden');
+            loadingProductsMsg.textContent = "Termékek betöltése...";
+            productsContainer.innerHTML = ''; // Clear previous products
+            noProductsMessage.classList.add('hidden'); // Ensure hidden by default
 
-            // MEGOLDÁS: A Firebase adatbázis útvonalának javítása
-            db.ref('marketplace/products').on('value', (snapshot) => { 
-                productsContainer.innerHTML = ''; 
+            const productsRef = db.ref('marketplace/products');
+
+            // Listen for changes in products (real-time updates)
+            productsRef.on('value', (snapshot) => {
+                productsContainer.innerHTML = ''; // Clear for fresh load
                 const products = [];
-                snapshot.forEach((childSnapshot) => {
+                snapshot.forEach(childSnapshot => {
                     const product = childSnapshot.val();
-                    // Csak azokat a termékeket jelenítjük meg, amelyek nincsenek eladva, ÉS nem a bejelentkezett felhasználó az eladó
-                    // Az 'isSold' alapértelmezett értéke false, ha nincs definiálva
-                    if (!(product.isSold === true) && product.seller !== currentUser) { 
+                    // Csak azokat a termékeket mutatjuk, amelyek nincsenek eladva ÉS nincsenek törölve
+                    // ÉS nem a bejelentkezett felhasználó az eladó (mert azt nem veheti meg)
+                    if (!(product.isSold === true) && !(product.deleted === true) && product.seller !== currentUser) {
                         products.push(product);
                     }
                 });
@@ -447,53 +527,42 @@
                 products.forEach(product => {
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
-                    
-                    const imgElement = document.createElement('img');
-                    imgElement.src = product.imageUrl || 'https://placehold.co/250x160/cccccc/333333?text=Nincs%20k%C3%A9p'; 
-                    imgElement.alt = product.name;
-                    imgElement.onerror = function() {
-                        this.onerror=null; 
-                        this.src='https://placehold.co/250x160/cccccc/333333?text=K%C3%A9p%20hiba!'; 
-                    };
-                    productCard.appendChild(imgElement);
 
-                    const nameElement = document.createElement('h3');
-                    nameElement.textContent = product.name;
-                    productCard.appendChild(nameElement);
+                    // Placeholder image if imageUrl is missing or invalid
+                    const imageUrl = product.imageUrl || `https://placehold.co/400x250/cccccc/333333?text=${encodeURIComponent(product.name)}`;
 
-                    const descriptionElement = document.createElement('p');
-                    descriptionElement.className = 'description';
-                    descriptionElement.textContent = product.description;
-                    productCard.appendChild(descriptionElement);
-
-                    const priceElement = document.createElement('p');
-                    priceElement.className = 'price';
-                    priceElement.textContent = `${product.price.toLocaleString('hu-HU')} Ft`;
-                    productCard.appendChild(priceElement);
-
-                    const sellerElement = document.createElement('p');
-                    sellerElement.className = 'seller';
-                    sellerElement.textContent = `Eladó: ${product.seller}`;
-                    productCard.appendChild(sellerElement);
-
-                    const buyButton = document.createElement('button');
-                    buyButton.textContent = 'Megveszem';
-                    buyButton.onclick = () => buyProduct(product.id, product.price, product.seller);
-                    productCard.appendChild(buyButton);
-
+                    productCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Nincs+k\u00E9p';">
+                        <h3>${product.name}</h3>
+                        <p class="description">${product.description}</p>
+                        <div class="price">${product.price.toLocaleString('hu-HU')} Ft</div>
+                        <p class="seller">Eladó: ${product.seller}</p>
+                        <button onclick="buyProduct('${product.id}', ${product.price}, '${product.seller}', '${product.name}')">Megveszem</button>
+                    `;
                     productsContainer.appendChild(productCard);
                 });
 
-                loadingProductsMsg.classList.add('hidden'); 
+                loadingProductsMsg.classList.add('hidden'); // Hide loading message
             }, (error) => {
                 console.error("Hiba a termékek lekérdezésekor:", error);
                 loadingProductsMsg.textContent = "Hiba a termékek betöltésekor.";
                 loadingProductsMsg.classList.add('error');
+                loadingProductsMsg.classList.remove('hidden');
             });
         }
 
         // Termék vásárlása
-        async function buyProduct(productId, productPrice, sellerName) {
+        async function buyProduct(productId, productPrice, sellerName, productName) {
+            if (!currentUser) {
+                showMessage('Kérjük, jelentkezzen be a vásárláshoz!', true);
+                return;
+            }
+
+            if (currentUser === sellerName) {
+                showMessage('Nem vásárolhatod meg a saját termékedet!', true);
+                return;
+            }
+
             const amount = parseInt(productPrice);
 
             // Custom modal instead of confirm()
@@ -501,7 +570,7 @@
             confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
             confirmModal.innerHTML = `
                 <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-4">
-                    <p class="text-xl font-semibold mb-6">Biztosan megvásárolod ezt a terméket <br><span class="text-blue-600">${amount.toLocaleString('hu-HU')} Ft</span>-ért?</p>
+                    <p class="text-xl font-semibold mb-6">Biztosan megvásárolod a(z) <span class="text-blue-600">"${productName}"</span> terméket <br><span class="text-blue-600">${amount.toLocaleString('hu-HU')} Ft</span>-ért?</p>
                     <div class="flex justify-center gap-4">
                         <button id="confirmBuyBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Igen</button>
                         <button id="cancelBuyBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">Mégsem</button>
@@ -515,12 +584,11 @@
                 try {
                     const buyerBalanceRef = db.ref(`balances/${currentUser}`);
                     const sellerBalanceRef = db.ref(`balances/${sellerName}`);
-                    // MEGOLDÁS: A Firebase termék útvonalának javítása a vásárlásnál is
                     const productRef = db.ref(`marketplace/products/${productId}`); 
 
                     let buyerCurrentBalance = (await buyerBalanceRef.once('value')).val() || 0;
                     if (buyerCurrentBalance < amount) {
-                        showMessage("message", "Nincs elég fedezet a vásárláshoz!", true);
+                        showMessage("Nincs elég fedezet a vásárláshoz!", true);
                         return;
                     }
 
@@ -533,7 +601,7 @@
                     });
 
                     if (!buyerTransactionResult.committed) {
-                        showMessage("message", "Hiba történt a vásárló egyenlegének frissítésekor.", true);
+                        showMessage("Hiba történt a vásárló egyenlegének frissítésekor.", true);
                         return;
                     }
 
@@ -542,35 +610,38 @@
                         return (currentBalance || 0) + amount;
                     });
 
-                    // Termék státuszának frissítése (isSold)
+                    // Termék státuszának frissítése (isSold, buyer, saleDate)
                     await productRef.update({
                         isSold: true,
-                        buyer: currentUser,
+                        buyer: currentUser, // A Firebase struktúra szerint a `buyer` rögzíti a tulajdonost
                         saleDate: new Date().toISOString()
                     });
 
-                    showMessage("message", `Sikeres vásárlás! Kifizettél ${amount.toLocaleString('hu-HU')} Ft-ot.`, false);
-                    recordTransaction(currentUser, sellerName, -amount, `Marketplace vásárlás: ${productId} (${productPrice} Ft)`);
-                    recordTransaction(sellerName, currentUser, amount, `Marketplace eladás: ${productId} (${productPrice} Ft)`);
+                    showMessage(`Sikeres vásárlás! Kifizettél ${amount.toLocaleString('hu-HU')} Ft-ot.`, false);
                     
-                    // fetchProducts() automatically updates because of 'on("value")' listener
-                    updateBalanceDisplay(); 
+                    // Tranzakciók rögzítése a recordTransaction helper függvénnyel
+                    recordTransaction(currentUser, sellerName, -amount, `Marketplace vásárlás: ${productName}`, 'purchase', productName);
+                    recordTransaction(sellerName, currentUser, amount, `Marketplace eladás: ${productName}`, 'sale', productName);
                     
+                    updateBalanceDisplay(); // Egyenleg kijelző frissítése
+                    // A terméklista automatikusan frissül az 'on("value")' figyelő miatt
                 } catch (error) {
                     console.error("Hiba a vásárlás során:", error);
-                    showMessage("message", `Hiba a vásárlás során: ${error.message}`, true);
+                    showMessage(`Hiba a vásárlás során: ${error.message}`, true);
                 }
             };
             document.getElementById('cancelBuyBtn').onclick = () => {
                 document.body.removeChild(confirmModal);
-                showMessage("message", "Vásárlás megszakítva.", true);
+                showMessage("Vásárlás megszakítva.", true);
             };
         }
 
         // Oldal betöltésekor
         document.addEventListener('DOMContentLoaded', () => {
-            updateBalanceDisplay();
-            fetchProducts(); 
+            if (currentUser) {
+                updateBalanceDisplay();
+                fetchProducts(); 
+            }
         });
     </script>
 </body>
